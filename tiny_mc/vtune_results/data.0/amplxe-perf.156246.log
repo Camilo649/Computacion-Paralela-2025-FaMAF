@@ -1,0 +1,63 @@
+threads_spec: cpu
+Using CPUID GenuineIntel-6-BA-3
+DEBUGINFOD_URLS=
+Compression enabled, disabling build id collection at the end of the session.
+nr_threads: 12
+thread_masks[0]: 0x56be0da53460: maps mask[12]: 0
+thread_masks[0]: 0x56be0da53470: affinity mask[12]: 0
+thread_masks[1]: 0x56be0da53480: maps mask[12]: 1
+thread_masks[1]: 0x56be0da53490: affinity mask[12]: 1
+thread_masks[2]: 0x56be0da534a0: maps mask[12]: 2
+thread_masks[2]: 0x56be0da534b0: affinity mask[12]: 2
+thread_masks[3]: 0x56be0da534c0: maps mask[12]: 3
+thread_masks[3]: 0x56be0da534d0: affinity mask[12]: 3
+thread_masks[4]: 0x56be0da534e0: maps mask[12]: 4
+thread_masks[4]: 0x56be0da534f0: affinity mask[12]: 4
+thread_masks[5]: 0x56be0da53500: maps mask[12]: 5
+thread_masks[5]: 0x56be0da53510: affinity mask[12]: 5
+thread_masks[6]: 0x56be0da53520: maps mask[12]: 6
+thread_masks[6]: 0x56be0da53530: affinity mask[12]: 6
+thread_masks[7]: 0x56be0da53540: maps mask[12]: 7
+thread_masks[7]: 0x56be0da53550: affinity mask[12]: 7
+thread_masks[8]: 0x56be0da53560: maps mask[12]: 8
+thread_masks[8]: 0x56be0da53570: affinity mask[12]: 8
+thread_masks[9]: 0x56be0da53580: maps mask[12]: 9
+thread_masks[9]: 0x56be0da53590: affinity mask[12]: 9
+thread_masks[10]: 0x56be0da535a0: maps mask[12]: 10
+thread_masks[10]: 0x56be0da535b0: affinity mask[12]: 10
+thread_masks[11]: 0x56be0da535c0: maps mask[12]: 11
+thread_masks[11]: 0x56be0da535d0: affinity mask[12]: 11
+nr_cblocks: 0
+affinity: SYS
+mmap flush: 1
+comp level: 1
+mmap size 528384B
+threads[156248]: started on cpu1
+threads[156249]: started on cpu2
+threads[156250]: started on cpu3
+threads[156251]: started on cpu4
+threads[156252]: started on cpu5
+threads[156253]: started on cpu6
+threads[156254]: started on cpu7
+threads[156255]: started on cpu8
+threads[156256]: started on cpu9
+threads[156257]: started on cpu10
+threads[156258]: started on cpu11
+threads[156246]: started on cpu0
+
+156247:perf-sync:ready:TSC=58697836211800
+[ perf record: Woken up 3 times to write data ]
+threads[156246]: samples=1, wakes=1, transferred=77160, compressed=10774
+threads[156248]: samples=7, wakes=4, transferred=630560, compressed=83498
+threads[156249]: samples=1, wakes=2, transferred=39624, compressed=7209
+threads[156250]: samples=1, wakes=2, transferred=7856, compressed=1636
+threads[156251]: samples=2, wakes=2, transferred=23200, compressed=4735
+threads[156252]: samples=2, wakes=2, transferred=37424, compressed=7218
+threads[156253]: samples=2, wakes=2, transferred=23560, compressed=3867
+threads[156254]: samples=1, wakes=2, transferred=20448, compressed=3706
+threads[156255]: samples=1, wakes=2, transferred=14864, compressed=3011
+threads[156256]: samples=1, wakes=2, transferred=33208, compressed=5727
+threads[156257]: samples=2, wakes=2, transferred=13744, compressed=2786
+threads[156258]: samples=1, wakes=2, transferred=23672, compressed=4495
+failed to write feature CPU_PMU_CAPS
+[ perf record: Captured and wrote 2.238 MB /home/camilo/Desktop/Computacion Paralela/Laboratorios/Computacion-Paralela-2025-FaMAF/tiny_mc/vtune_results/data.0/system-wide.perf, compressed (original 0.902 MB, ratio is 6.817) ]
