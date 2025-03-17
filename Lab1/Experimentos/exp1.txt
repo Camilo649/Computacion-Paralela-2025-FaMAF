@@ -1,0 +1,32 @@
+Compilador: gcc
+Flags: -std=c11 -Wall -Wextra
+Compilacion: Makefile
+
+Resultados:
+
+ Performance counter stats for './headless' (700 runs):
+
+            137.99 msec task-clock                       #    0.995 CPUs utilized               ( +-  0.18% )
+                 2      context-switches                 #   14.494 /sec                        ( +-  2.72% )
+                 1      cpu-migrations                   #    7.247 /sec                        ( +-  4.50% )
+                76      page-faults                      #  550.775 /sec                        ( +-  0.05% )
+       298,871,585      cpu_atom/cycles/                 #    2.166 GHz                         ( +-  1.45% )  (3.33%)
+       520,204,757      cpu_core/cycles/                 #    3.770 GHz                         ( +-  0.18% )  (95.22%)
+       455,601,913      cpu_atom/instructions/           #    1.52  insn per cycle              ( +-  1.84% )  (4.05%)
+       881,396,564      cpu_core/instructions/           #    2.95  insn per cycle              ( +-  0.08% )  (95.22%)
+        82,208,968      cpu_atom/branches/               #  595.772 M/sec                       ( +-  1.82% )  (4.05%)
+       157,208,268      cpu_core/branches/               #    1.139 G/sec                       ( +-  0.08% )  (95.22%)
+           862,121      cpu_atom/branch-misses/          #    1.05% of all branches             ( +-  1.91% )  (4.05%)
+         1,077,708      cpu_core/branch-misses/          #    1.31% of all branches             ( +-  0.08% )  (95.22%)
+             TopdownL1 (cpu_core)                 #     53.5 %  tma_backend_bound      
+                                                  #      3.6 %  tma_bad_speculation    
+                                                  #      8.2 %  tma_frontend_bound     
+                                                  #     34.7 %  tma_retiring             ( +-  0.18% )  (95.22%)
+             TopdownL1 (cpu_atom)                 #     10.3 %  tma_bad_speculation    
+                                                  #     35.8 %  tma_retiring             ( +-  1.77% )  (4.05%)
+                                                  #     41.4 %  tma_backend_bound      
+                                                  #     12.4 %  tma_frontend_bound       ( +-  1.45% )  (4.06%)
+
+          0.138625 +- 0.000256 seconds time elapsed  ( +-  0.18% )
+          
+  325.190381 K photons per second
