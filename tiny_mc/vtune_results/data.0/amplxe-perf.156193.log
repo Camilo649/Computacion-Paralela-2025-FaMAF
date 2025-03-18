@@ -1,9 +1,0 @@
-Using CPUID GenuineIntel-6-BA-3
-DEBUGINFOD_URLS=
-Compression enabled, disabling build id collection at the end of the session.
-nr_cblocks: 0
-affinity: SYS
-mmap flush: 1
-comp level: 1
-Error:
-Cannot collect data source with the load latency event alone. Please add an auxiliary event in front of the load latency event.
