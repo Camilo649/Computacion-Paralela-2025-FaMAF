@@ -1,5 +1,5 @@
 # Compilers
-CC = gcc
+CC = intel
 
 # Flags
 CFLAGS = -g -std=c11 -Wall -Wextra -Werror -O3 -march=native
