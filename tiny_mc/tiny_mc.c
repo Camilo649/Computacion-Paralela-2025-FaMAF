@@ -10,6 +10,7 @@
 #include "params.h"
 #include "photon.h"
 #include "wtime.h"
+#include "Xorshift128+.h"
 
 #include <assert.h>
 // #include <math.h>
@@ -41,11 +42,14 @@ int main(void)
 
     // configure RNG
     srand(SEED);
+    // Xorshift128+ generator initialization
+    Xorshift128Plus rng;
+    xorshift128plus_init(&rng, (uint64_t)SEED, (uint64_t)(SEED + rand()));
     // start timer
     float start = wtime();
     // simulation
     for (unsigned int i = 0; i < PHOTONS; ++i) {
-        photon(heat, heat2);
+        photon(&rng, heat, heat2);
     }
     // stop timer
     float end = wtime();

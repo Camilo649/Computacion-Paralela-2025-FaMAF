@@ -2,7 +2,6 @@
 
 # Valor inicial de PHOTONS
 PHOTONS=65536
-# Saque la variable i
 
 # Archivo de salida
 OUTPUT_FILE="results.csv"

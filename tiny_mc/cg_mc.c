@@ -3,9 +3,12 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "params.h"
 #include "photon.h"
+#include "Xorshift128+.h"
 
 #define PHOTON_CAP 1 << 16
 #define MAX_PHOTONS_PER_FRAME 20
@@ -68,7 +71,7 @@ static const char *FSHADER = ""
 ;
 // clang-format on
 
-void update(void)
+void update(Xorshift128Plus* rng)
 {
     if (remaining_photons <= 0) {
         return;
@@ -80,7 +83,7 @@ void update(void)
         --remaining_photons;
         --remaining_photons_in_frame;
 
-        photon(heats, _heats_squared);
+        photon(rng, heats, _heats_squared);
     }
 
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(heats), heats);
@@ -144,10 +147,16 @@ int main(void)
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(heats), heats, GL_DYNAMIC_DRAW);
 
+    // configure RNG
+    srand(SEED);
+    // Inicialización del generador Xorshift128+
+    Xorshift128Plus rng;
+    xorshift128plus_init(&rng, (uint64_t)SEED, (uint64_t)(SEED + rand()));
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        update();
+        update(&rng);
 
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLES, 0, 6);

@@ -12,7 +12,7 @@ CG_LDFLAGS = -lm -lglfw -lGL -lGLEW
 TARGETS = headless head
 
 # Files
-C_SOURCES = wtime.c photon.c
+C_SOURCES = wtime.c photon.c Xorshift128+.c
 C_OBJS = $(patsubst %.c, %.o, $(C_SOURCES))
 
 # VTune analysis
