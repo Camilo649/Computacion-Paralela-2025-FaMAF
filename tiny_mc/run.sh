@@ -14,8 +14,8 @@ for _ in {1..10}; do
     echo "Running with PHOTONS=$PHOTONS"
     
     # Compilar con el nuevo valor de PHOTONS
-    make clean
-    make CFLAGS="-g -std=c11 -Wall -Wextra -Werror -O3 -march=native -DPHOTONS=$PHOTONS" > /dev/null
+    make clean > /dev/null
+    make CFLAGS="-g -std=c11 -ffast-math  -Wall -Wextra -Werror -O3 -march=native -DPHOTONS=$PHOTONS" > /dev/null
     
     # Ejecutar el programa y guardar la salida en una variable
     KFOTONES=$(./headless)
