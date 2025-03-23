@@ -1,15 +1,18 @@
 # Compilers
-CC = gcc
+CC = icx
 
 # Flags
-CFLAGS = -g -std=c11 -Wall -Wextra -Werror -O3 -march=native
+CFLAGS = -g -std=c11 -ffast-math  -Wall -Wextra -Werror -O3 -march=native 
+TINY_LDFLAGS = -lm
+CG_LDFLAGS = -lm -lglfw -lGL -lGLEW
+
 TINY_LDFLAGS = -lm
 CG_LDFLAGS = -lm -lglfw -lGL -lGLEW
 
 TARGETS = headless head
 
 # Files
-C_SOURCES = wtime.c photon.c
+C_SOURCES = wtime.c photon.c Xorshift128+.c
 C_OBJS = $(patsubst %.c, %.o, $(C_SOURCES))
 
 # VTune analysis

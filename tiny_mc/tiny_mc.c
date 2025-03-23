@@ -10,21 +10,22 @@
 #include "params.h"
 #include "photon.h"
 #include "wtime.h"
+#include "Xorshift128+.h"
 
 #include <assert.h>
-#include <math.h>
+// #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-char t1[] = "Tiny Monte Carlo by Scott Prahl (http://omlc.ogi.edu)";
-char t2[] = "1 W Point Source Heating in Infinite Isotropic Scattering Medium";
-char t3[] = "CPU version, adapted for PEAGPGPU by Gustavo Castellano"
-            " and Nicolas Wolovick";
+// char t1[] = "Tiny Monte Carlo by Scott Prahl (http://omlc.ogi.edu)";
+// char t2[] = "1 W Point Source Heating in Infinite Isotropic Scattering Medium";
+// char t3[] = "CPU version, adapted for PEAGPGPU by Gustavo Castellano"
+//             " and Nicolas Wolovick";
 
 
 // global state, heat and heat square in each shell
-static float heat[SHELLS];
-static float heat2[SHELLS];
+ float heat[SHELLS]={0};
+ float heat2[SHELLS]={0};
 
 
 /***
@@ -41,19 +42,22 @@ int main(void)
 
     // configure RNG
     srand(SEED);
+    // Xorshift128+ generator initialization
+    Xorshift128Plus rng;
+    xorshift128plus_init(&rng, (uint64_t)SEED, (uint64_t)(SEED + rand()));
     // start timer
-    double start = wtime();
+    float start = wtime();
     // simulation
     for (unsigned int i = 0; i < PHOTONS; ++i) {
-        photon(heat, heat2);
+        photon(&rng, heat, heat2);
     }
     // stop timer
-    double end = wtime();
+    float end = wtime();
     assert(start <= end);
-    double elapsed = end - start;
+    float elapsed = end - start;
 
-    // printf("# %lf seconds\n", elapsed);
-    printf("%lf\n", 1e-3 * PHOTONS / elapsed);
+    // printf("# %f seconds\n", elapsed);
+    printf("%f\n", 1e-3 * PHOTONS / elapsed);
 
     // printf("# Radius\tHeat\n");
     // printf("# [microns]\t[W/cm^3]\tError\n");
