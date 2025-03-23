@@ -23,8 +23,8 @@
 
 
 // global state, heat and heat square in each shell
-static float heat[SHELLS];
-static float heat2[SHELLS];
+ float heat[SHELLS]={0};
+ float heat2[SHELLS]={0};
 
 
 /***
@@ -42,18 +42,18 @@ int main(void)
     // configure RNG
     srand(SEED);
     // start timer
-    double start = wtime();
+    float start = wtime();
     // simulation
     for (unsigned int i = 0; i < PHOTONS; ++i) {
         photon(heat, heat2);
     }
     // stop timer
-    double end = wtime();
+    float end = wtime();
     assert(start <= end);
-    double elapsed = end - start;
+    float elapsed = end - start;
 
-    // printf("# %lf seconds\n", elapsed);
-    printf("%lf\n", 1e-3 * PHOTONS / elapsed);
+    // printf("# %f seconds\n", elapsed);
+    printf("%f\n", 1e-3 * PHOTONS / elapsed);
 
     // printf("# Radius\tHeat\n");
     // printf("# [microns]\t[W/cm^3]\tError\n");
