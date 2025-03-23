@@ -12,14 +12,14 @@
 #include "wtime.h"
 
 #include <assert.h>
-#include <math.h>
+// #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-char t1[] = "Tiny Monte Carlo by Scott Prahl (http://omlc.ogi.edu)";
-char t2[] = "1 W Point Source Heating in Infinite Isotropic Scattering Medium";
-char t3[] = "CPU version, adapted for PEAGPGPU by Gustavo Castellano"
-            " and Nicolas Wolovick";
+// char t1[] = "Tiny Monte Carlo by Scott Prahl (http://omlc.ogi.edu)";
+// char t2[] = "1 W Point Source Heating in Infinite Isotropic Scattering Medium";
+// char t3[] = "CPU version, adapted for PEAGPGPU by Gustavo Castellano"
+//             " and Nicolas Wolovick";
 
 
 // global state, heat and heat square in each shell
