@@ -1,5 +1,5 @@
 # Compilers
-CC = gcc
+CC = icx
 
 # Flags
 CFLAGS = -g -std=c11 -ffast-math  -Wall -Wextra -Werror -O3 -march=native 

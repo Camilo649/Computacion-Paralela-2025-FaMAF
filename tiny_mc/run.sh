@@ -18,7 +18,7 @@ for _ in {1..10}; do
     make CFLAGS="-g -std=c11 -ffast-math  -Wall -Wextra -Werror -O3 -march=native -DPHOTONS=$PHOTONS" > /dev/null
     
     # Ejecutar el programa y guardar la salida en una variable
-    KFOTONES=$(./headless)
+    KFOTONES=$(taskset -c 0,1 ./headless)
     
     # Escribir en CSV
     echo "$PHOTONS,$KFOTONES" >> $OUTPUT_FILE
