@@ -1,35 +1,39 @@
 #include <math.h>
 
-#include "params.h"
 #include "Xorshift128+.h"
+#include "params.h"
+#include "photon.h"
 
-void photon(Xorshift128Plus* rng, float* heats, float* heats_squared)
+Photon photons[PHOTONS];
+
+void photon(unsigned int index, Xorshift128Plus* rng, float* heats, float* heats_squared)
 {
     const float albedo = MU_S / (MU_S + MU_A);
     const float shells_per_mfp = 1e4 / MICRONS_PER_SHELL / (MU_A + MU_S);
 
     /* launch */
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
-    float u = 0.0f;
-    float v = 0.0f;
-    float w = 1.0f;
-    float weight = 1.0f;
+    Photon p = {
+        0.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        1.0f
+    };
+
+    photons[index] = p;
 
     for (;;) {
         float t = -logf(xorshift128plus_randf(rng)); /* move */
-        x += t * u;
-        y += t * v;
-        z += t * w;
+        photons[index].x += t * photons[index].u;
+        photons[index].y += t * photons[index].v;
+        photons[index].z += t * photons[index].w;
 
-        unsigned int shell = sqrtf(x * x + y * y + z * z) * shells_per_mfp; /* absorb */
+        unsigned int shell = sqrtf(photons[index].x * photons[index].x + photons[index].y * photons[index].y + photons[index].z * photons[index].z) * shells_per_mfp; /* absorb */
+
         if (shell > SHELLS - 1) {
             shell = SHELLS - 1;
         }
-        heats[shell] += (1.0f - albedo) * weight;
-        heats_squared[shell] += (1.0f - albedo) * (1.0f - albedo) * weight * weight; /* add up squares */
-        weight *= albedo;
+        heats[shell] += (1.0f - albedo) * photons[index].weight;
+        heats_squared[shell] += (1.0f - albedo) * (1.0f - albedo) * photons[index].weight * photons[index].weight; /* add up squares */
+        photons[index].weight *= albedo;
 
         /* New direction, rejection method */
         float xi1, xi2;
@@ -38,14 +42,14 @@ void photon(Xorshift128Plus* rng, float* heats, float* heats_squared)
             xi2 = 2.0f * xorshift128plus_randf(rng) - 1.0f;
             t = xi1 * xi1 + xi2 * xi2;
         } while (1.0f < t);
-        u = 2.0f * t - 1.0f;
-        v = xi1 * sqrtf((1.0f - u * u) / t);
-        w = xi2 * sqrtf((1.0f - u * u) / t);
+        photons[index].u = 2.0f * t - 1.0f;
+        photons[index].v = xi1 * sqrtf((1.0f - photons[index].u * photons[index].u) / t);
+        photons[index].w = xi2 * sqrtf((1.0f - photons[index].u * photons[index].u) / t);
 
-        if (weight < 0.001f) { /* roulette */
+        if (photons[index].weight < 0.001f) { /* roulette */
             if (xorshift128plus_randf(rng) > 0.1f)
                 break;
-            weight /= 0.1f;
+            photons[index].weight /= 0.1f;
         }
     }
 }

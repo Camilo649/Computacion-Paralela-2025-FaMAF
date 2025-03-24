@@ -2,7 +2,7 @@
 CC = icx
 
 # Flags
-CFLAGS = -g -std=c11 -ffast-math  -Wall -Wextra -Werror -O3 -march=native 
+CFLAGS = -g -std=c11 -ffast-math -Wall -Wextra -Werror -O3 -march=native
 TINY_LDFLAGS = -lm
 CG_LDFLAGS = -lm -lglfw -lGL -lGLEW
 

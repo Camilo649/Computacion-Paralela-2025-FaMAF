@@ -7,10 +7,10 @@
 
 #define _XOPEN_SOURCE 500 // M_PI
 
+#include "Xorshift128+.h"
 #include "params.h"
 #include "photon.h"
 #include "wtime.h"
-#include "Xorshift128+.h"
 
 #include <assert.h>
 // #include <math.h>
@@ -22,10 +22,9 @@
 // char t3[] = "CPU version, adapted for PEAGPGPU by Gustavo Castellano"
 //             " and Nicolas Wolovick";
 
-
 // global state, heat and heat square in each shell
- float heat[SHELLS]={0};
- float heat2[SHELLS]={0};
+float heat[SHELLS] = { 0 };
+float heat2[SHELLS] = { 0 };
 
 
 /***
@@ -48,8 +47,8 @@ int main(void)
     // start timer
     float start = wtime();
     // simulation
-    for (unsigned int i = 0; i < PHOTONS; ++i) {
-        photon(&rng, heat, heat2);
+    for (size_t i = 0; i < PHOTONS; ++i) {
+        photon(i, &rng, heat, heat2);
     }
     // stop timer
     float end = wtime();
