@@ -1,0 +1,21 @@
+Compilador: gcc
+Flags: -g -std=c11 -ffast-math  -Wall -Wextra -Werror -O3 -march=native
+Ejecucion: taskset -c 0,1 ./headless
+Compilacion: Makefile
+
+Resultados:
+
+PHOTONS	 Kphotons/seg
+65536	 309.257438
+131072	 289.887102
+262144	 297.270715
+524288	 295.308532
+1048576	 279.911842
+2097152	 278.207494
+4194304	 277.847541
+8388608	 273.468995
+16777216 267.153952
+33554432 268.91446
+
+
+
