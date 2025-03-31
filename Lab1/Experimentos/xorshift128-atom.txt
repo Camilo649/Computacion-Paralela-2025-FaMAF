@@ -1,0 +1,19 @@
+Compilador: gcc
+Flags: -g -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto
+Ejecucion: ./headless
+Compilacion: Makefile
+Cambios: rand por XorShift128+
+
+Resultados:
+
+PHOTONS  Kphotons/seg
+65536    387.385392
+131072   369.581998
+262144   361.318954
+524288   361.318954
+1048576  361.318954
+2097152  360.391917
+4194304  344.445094
+8388608  344.445094
+16777216 343.343418
+33554432 338.872988

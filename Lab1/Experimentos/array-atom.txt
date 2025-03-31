@@ -1,0 +1,19 @@
+Compilador: gcc
+Flags: -g -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto
+Ejecucion: ./headless
+Compilacion: Makefile
+Cambios: Arreglo de fotones
+
+Resultados:
+
+PHOTONS  Kphotons/seg
+65536    524.288000
+131072   524.288000
+262144   524.288000
+524288   524.288000
+1048576  524.288000
+2097152  524.288000
+4194304  508.400485
+8388608  508.400485
+16777216 508.400485
+33554432 504.577925
