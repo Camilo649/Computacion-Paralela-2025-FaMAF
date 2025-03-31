@@ -1,0 +1,21 @@
+CPU:
+
+Model name:                           AMD EPYC 7643 48-Core Processor
+Thread(s) per core:                   1
+Core(s) per socket:                   48
+Socket(s):                            1
+CPU max MHz:                          3640.9170
+
+MEMORIA:
+
+18GiB
+
+Compilador:
+
+gcc (Debian 14.2.0-16) 14.2.0
+
+Sistema Operativo:
+
+Distributor ID:	Debian
+Description:	Debian GNU/Linux trixie/sid
+x86_64
