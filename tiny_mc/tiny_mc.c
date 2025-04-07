@@ -9,7 +9,6 @@
 
 #include "Xorshift128+.h"
 #include "params.h"
-#include "photon.h"
 #include "wtime.h"
 
 #include <assert.h>
@@ -48,7 +47,7 @@ int main(void)
     float start = wtime();
     // simulation
     for (size_t i = 0; i < PHOTONS; ++i) {
-        photon(i, &rng, heat, heat2);
+        photon(&rng, heat, heat2);
     }
     // stop timer
     float end = wtime();

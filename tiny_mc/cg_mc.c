@@ -8,7 +8,6 @@
 
 #include "Xorshift128+.h"
 #include "params.h"
-#include "photon.h"
 
 #define PHOTON_CAP 1 << 16
 #define MAX_PHOTONS_PER_FRAME 20
@@ -83,7 +82,7 @@ void update(Xorshift128Plus* rng)
         --remaining_photons;
         --remaining_photons_in_frame;
 
-        photon(xorshift128plus_next(rng) % PHOTONS, rng, heats, _heats_squared);
+        photon(rng, heats, _heats_squared);
     }
 
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(heats), heats);
