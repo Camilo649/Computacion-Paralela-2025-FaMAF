@@ -9,6 +9,7 @@
 
 #include "Xorshift128+.h"
 #include "params.h"
+#include "photon.h"
 #include "wtime.h"
 
 #include <assert.h>

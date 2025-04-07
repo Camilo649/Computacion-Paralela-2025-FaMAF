@@ -14,10 +14,10 @@ for _ in {1..10}; do
     
     # Compilar con el nuevo valor de PHOTONS
     make clean > /dev/null
-    make CFLAGS="-g -std=c11 -ffast-math  -Wall -Wextra -Werror -O3 -march=native -DPHOTONS=$PHOTONS" > /dev/null
+    make CFLAGS="-g -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto -DPHOTONS=$PHOTONS" > /dev/null
     
     # Ejecutar el programa y guardar la salida en una variable
-    KFOTONES=$(taskset -c 0,1 ./headless)
+    KFOTONES=$(./headless)
     
     # Escribir en CSV
     echo "$PHOTONS,$KFOTONES" >> $OUTPUT_FILE
