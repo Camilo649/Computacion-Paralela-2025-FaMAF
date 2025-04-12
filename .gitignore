@@ -48,6 +48,7 @@ head
 *.su
 *.idb
 *.pdb
+*.optrpt
 
 # Kernel Module Compile Results
 *.mod*
