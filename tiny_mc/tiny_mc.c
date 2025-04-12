@@ -7,7 +7,7 @@
 
 #define _XOPEN_SOURCE 500 // M_PI
 
-#include "Xorshift128+.h"
+#include "xorshift32.h"
 #include "params.h"
 #include "photon.h"
 #include "wtime.h"
@@ -15,7 +15,7 @@
 #include <assert.h>
 // #include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
+// #include <stdlib.h>
 
 // char t1[] = "Tiny Monte Carlo by Scott Prahl (http://omlc.ogi.edu)";
 // char t2[] = "1 W Point Source Heating in Infinite Isotropic Scattering Medium";
@@ -42,8 +42,8 @@ int main(void)
     // configure RNG
     srand(SEED);
     // Xorshift128+ generator initialization
-    Xorshift128Plus rng;
-    xorshift128plus_init(&rng, (uint64_t)SEED, (uint64_t)(SEED + rand()));
+    Xorshift32 rng;
+    xorshift32_init(&rng, (uint32_t)SEED);
     // start timer
     float start = wtime();
     // simulation

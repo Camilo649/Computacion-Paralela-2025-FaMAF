@@ -6,7 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Xorshift128+.h"
+#include "xorshift32.h"
+#include "photon.h"
 #include "params.h"
 
 #define PHOTON_CAP 1 << 16
@@ -70,7 +71,7 @@ static const char *FSHADER = ""
 ;
 // clang-format on
 
-void update(Xorshift128Plus* rng)
+void update(Xorshift32* rng)
 {
     if (remaining_photons <= 0) {
         return;
@@ -149,8 +150,8 @@ int main(void)
     // configure RNG
     srand(SEED);
     // Inicialización del generador Xorshift128+
-    Xorshift128Plus rng;
-    xorshift128plus_init(&rng, (uint64_t)SEED, (uint64_t)(SEED + rand()));
+    Xorshift32 rng;
+    xorshift32_init(&rng, (uint32_t)SEED);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
