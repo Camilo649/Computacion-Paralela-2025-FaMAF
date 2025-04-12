@@ -15,6 +15,7 @@
 *.ilk
 *.map
 *.exp
+*.i
 
 # Precompiled Headers
 *.gch
@@ -42,7 +43,6 @@
 headless
 head
 
-
 # Debug files
 *.dSYM/
 *.su
@@ -57,3 +57,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Assembly
+*.s
