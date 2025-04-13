@@ -79,11 +79,16 @@ void update(Xorshift32* rng)
 
     int remaining_photons_in_frame = MAX_PHOTONS_PER_FRAME;
 
+    Photons p;
+    size_t index = 0;
+
     while (remaining_photons > 0 && remaining_photons_in_frame > 0) {
         --remaining_photons;
         --remaining_photons_in_frame;
 
-        photon(rng, heats, _heats_squared);
+        photon8(rng, &p, heats, _heats_squared, index%PHOTONS);
+
+        index += 8;
     }
 
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(heats), heats);

@@ -42,11 +42,12 @@ int main(void)
     // Xorshift32 generator initialization
     Xorshift32 rng;
     xorshift32_init(&rng);
+    Photons p;
     // start timer
     float start = wtime();
     // simulation
-    for (size_t i = 0; i < PHOTONS; ++i) {
-        photon(&rng, heat, heat2);
+    for (size_t i = 0; i < PHOTONS; i += 8) {
+        photon8(&rng, &p, heat, heat2, i);
     }
     // stop timer
     float end = wtime();
