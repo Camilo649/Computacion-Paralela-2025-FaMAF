@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Valor inicial de PHOTONS
-PHOTONS=65536
+PHOTONS=262144
 
 # Archivo de salida
 OUTPUT_FILE="results.csv"

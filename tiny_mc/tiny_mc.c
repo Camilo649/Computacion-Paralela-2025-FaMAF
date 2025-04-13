@@ -39,11 +39,9 @@ int main(void)
     // printf("# Absorption = %8.3f/cm\n", MU_A);
     // printf("# Photons    = %8d\n#\n", PHOTONS);
 
-    // configure RNG
-    srand(SEED);
-    // Xorshift128+ generator initialization
+    // Xorshift32 generator initialization
     Xorshift32 rng;
-    xorshift32_init(&rng, (uint32_t)SEED);
+    xorshift32_init(&rng);
     // start timer
     float start = wtime();
     // simulation

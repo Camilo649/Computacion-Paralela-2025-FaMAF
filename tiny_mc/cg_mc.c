@@ -147,11 +147,9 @@ int main(void)
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(heats), heats, GL_DYNAMIC_DRAW);
 
-    // configure RNG
-    srand(SEED);
-    // Inicialización del generador Xorshift128+
+    // Inicialización del generador Xorshift32
     Xorshift32 rng;
-    xorshift32_init(&rng, (uint32_t)SEED);
+    xorshift32_init(&rng);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <time.h> // time
-
 #ifndef SHELLS
 #define SHELLS 101 // discretization level
 #endif
@@ -22,7 +20,4 @@
 #define MICRONS_PER_SHELL 25 // Thickness of spherical shells in microns
 #endif
 
-#ifndef SEED
-#define SEED (time(NULL)) // random seed
-#endif
 
