@@ -22,4 +22,9 @@ typedef struct {
  * @param heats_squared     Arreglo que acumula el cuadrado de la energía absorbida (para varianza).
  * @param index             Índice del foton.
  */
-void photon8(Xorshift32* rng, Photons* p, float* heats, float* heats_squared, size_t index);
+void photon8(Xorshift32* restrict rng,
+    Photons* restrict p,
+    float* restrict heats,
+    float* restrict heats_squared,
+    size_t index);
+

@@ -7,7 +7,7 @@
 #include "params.h"
 #include "photon.h"
 
-void photon8(Xorshift32* rng, Photons* p, float* heats, float* heats_squared, size_t index)
+void photon8(Xorshift32* restrict rng, Photons* restrict p, float* restrict heats, float* restrict heats_squared, size_t index)
 {
     const float mu_total = MU_S + MU_A;
     const float albedo = MU_S / mu_total;
