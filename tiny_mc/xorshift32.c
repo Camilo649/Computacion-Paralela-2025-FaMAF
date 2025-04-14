@@ -1,4 +1,5 @@
 #include "xorshift32.h"
+#include "params.h"
 #include <immintrin.h>
 #include <time.h>
 
@@ -14,9 +15,8 @@ uint32_t splitmix32(uint32_t x) {
 // Inicialización del generador Xorshift32
 void xorshift32_init(Xorshift32* rng)
 {
-    uint32_t seed = time(NULL);
     for (int i = 0; i < 8; ++i) {
-        rng->state[i] = splitmix32(seed + i);
+        rng->state[i] = splitmix32(SEED + i);
     }
 }
 
