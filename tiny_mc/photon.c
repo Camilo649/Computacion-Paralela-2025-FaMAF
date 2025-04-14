@@ -82,9 +82,7 @@ void photon8(Xorshift32* rng, Photons* p, float* heats, float* heats_squared, si
             done_mask = _mm256_or_ps(done_mask, new_valid);
         } while (_mm256_movemask_ps(done_mask) != 0xFF);
 
-        __m256 a = _mm256_sub_ps(_mm256_set1_ps(1.0f), _mm256_mul_ps(xi1_valid, xi1_valid));
-        __m256 rsqrt_b = _mm256_rsqrt_ps(t_valid);
-        __m256 sqrt_factor = _mm256_mul_ps(_mm256_mul_ps(a, rsqrt_b), rsqrt_b);
+        __m256 sqrt_factor = _mm256_mul_ps(_mm256_sub_ps(_mm256_set1_ps(1.0f), _mm256_mul_ps(xi1_valid, xi1_valid)), _mm256_rsqrt_ps(t_valid));
         u = _mm256_sub_ps(_mm256_set1_ps(2.0f), _mm256_mul_ps(xi1_valid, sqrt_factor));
         v = _mm256_mul_ps(xi1_valid, sqrt_factor);
         w = _mm256_mul_ps(xi2_valid, sqrt_factor);
