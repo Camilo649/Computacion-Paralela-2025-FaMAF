@@ -50,7 +50,7 @@ void photon8(Xorshift32* rng, Photons* p, float* heats, float* heats_squared, si
 
         /* absorb */
         __m256 r2 = _mm256_add_ps(_mm256_mul_ps(x, x), _mm256_add_ps(_mm256_mul_ps(y, y), _mm256_mul_ps(z, z)));
-        __m256 sqrt_r2 = _mm256_sqrt_ps(r2);
+        __m256 sqrt_r2 = _mm256_mul_ps(r2, _mm256_rsqrt_ps(r2));
         __m256 shell = _mm256_mul_ps(sqrt_r2, _mm256_set1_ps(shells_per_mfp));
         shell = _mm256_min_ps(shell, _mm256_set1_ps(SHELLS - 1));
         __m256 absorbed = _mm256_mul_ps(_mm256_set1_ps(one_minus_albedo), weight);
@@ -82,7 +82,9 @@ void photon8(Xorshift32* rng, Photons* p, float* heats, float* heats_squared, si
             done_mask = _mm256_or_ps(done_mask, new_valid);
         } while (_mm256_movemask_ps(done_mask) != 0xFF);
 
-        __m256 sqrt_factor = _mm256_sqrt_ps(_mm256_div_ps(_mm256_sub_ps(_mm256_set1_ps(1.0f), _mm256_mul_ps(xi1_valid, xi1_valid)), t_valid));
+        __m256 a = _mm256_sub_ps(_mm256_set1_ps(1.0f), _mm256_mul_ps(xi1_valid, xi1_valid));
+        __m256 rsqrt_b = _mm256_rsqrt_ps(t_valid);
+        __m256 sqrt_factor = _mm256_mul_ps(_mm256_mul_ps(a, rsqrt_b), rsqrt_b);
         u = _mm256_sub_ps(_mm256_set1_ps(2.0f), _mm256_mul_ps(xi1_valid, sqrt_factor));
         v = _mm256_mul_ps(xi1_valid, sqrt_factor);
         w = _mm256_mul_ps(xi2_valid, sqrt_factor);
