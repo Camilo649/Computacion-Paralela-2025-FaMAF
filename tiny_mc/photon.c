@@ -38,12 +38,9 @@ void photon8(Xorshift32* restrict rng, Photons* restrict p, float* restrict heat
         }
 
         /* move */
-        __m256 rand_vals = xorshift32_randf8(rng);
-        __m256 t;
-        for (int i = 0; i < 8; i++) {
-            float r = ((float*)&rand_vals)[i];
-            ((float*)&t)[i] = -logf(r);
-        }
+         __m256 rand_vals = xorshift32_randf8(rng);
+        __m256 t = _mm256_log_ps(rand_vals);
+        t = _mm256_mul_ps(t, _mm256_set1_ps(-1.0f));
         x = _mm256_fmadd_ps(t, u, x);
         y = _mm256_fmadd_ps(t, v, y);
         z = _mm256_fmadd_ps(t, w, z);
