@@ -6,7 +6,7 @@
  */
 
 #define _XOPEN_SOURCE 500 // M_PI
-
+#include <GL/glew.h>    // Inclui esta libreria
 #include "params.h"
 #include "photon.h"
 #include "wtime.h"
