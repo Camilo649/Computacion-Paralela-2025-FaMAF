@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "params.h"
+#include "xorshift32.h"
 #include "photon.h"
-#include "Xorshift128+.h"
+#include "params.h"
 
 #define PHOTON_CAP 1 << 16
 #define MAX_PHOTONS_PER_FRAME 20
@@ -71,7 +71,7 @@ static const char *FSHADER = ""
 ;
 // clang-format on
 
-void update(Xorshift128Plus* rng)
+void update(Xorshift32* rng)
 {
     if (remaining_photons <= 0) {
         return;
@@ -79,11 +79,16 @@ void update(Xorshift128Plus* rng)
 
     int remaining_photons_in_frame = MAX_PHOTONS_PER_FRAME;
 
+    Photons p;
+    size_t index = 0;
+
     while (remaining_photons > 0 && remaining_photons_in_frame > 0) {
         --remaining_photons;
         --remaining_photons_in_frame;
 
-        photon(rng, heats, _heats_squared);
+        photon8(rng, &p, heats, _heats_squared, index%PHOTONS);
+
+        index += 8;
     }
 
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(heats), heats);
@@ -147,11 +152,9 @@ int main(void)
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(heats), heats, GL_DYNAMIC_DRAW);
 
-    // configure RNG
-    srand(SEED);
-    // Inicialización del generador Xorshift128+
-    Xorshift128Plus rng;
-    xorshift128plus_init(&rng, (uint64_t)SEED, (uint64_t)(SEED + rand()));
+    // Inicialización del generador Xorshift32
+    Xorshift32 rng;
+    xorshift32_init(&rng);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -170,4 +173,3 @@ int main(void)
     glfwDestroyWindow(window);
     glfwTerminate();
 }
-

@@ -1,0 +1,23 @@
+Input: 67108864
+Compilador: gcc
+Flags: -g -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto
+Ejecucion: ./headless
+Compilacion: Makefile
+
+Resultados:
+
+ Performance counter stats for './headless':
+
+         1,556,597      cache-misses                     #   11.68% of all cache refs         
+        13,323,213      cache-references                                                      
+
+     134.519065442 seconds time elapsed
+
+     134.488555000 seconds user
+       0.000000000 seconds sys
+
+				
+
+
+
+

@@ -6,26 +6,29 @@
  */
 
 #define _XOPEN_SOURCE 500 // M_PI
+<<<<<<< HEAD
 #include <GL/glew.h>    // Inclui esta libreria
+=======
+
+#include "xorshift32.h"
+>>>>>>> refs/remotes/origin/main
 #include "params.h"
 #include "photon.h"
 #include "wtime.h"
-#include "Xorshift128+.h"
 
 #include <assert.h>
 // #include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
+// #include <stdlib.h>
 
 // char t1[] = "Tiny Monte Carlo by Scott Prahl (http://omlc.ogi.edu)";
 // char t2[] = "1 W Point Source Heating in Infinite Isotropic Scattering Medium";
 // char t3[] = "CPU version, adapted for PEAGPGPU by Gustavo Castellano"
 //             " and Nicolas Wolovick";
 
-
 // global state, heat and heat square in each shell
- float heat[SHELLS]={0};
- float heat2[SHELLS]={0};
+float heat[SHELLS] = { 0 };
+float heat2[SHELLS] = { 0 };
 
 
 /***
@@ -40,16 +43,15 @@ int main(void)
     // printf("# Absorption = %8.3f/cm\n", MU_A);
     // printf("# Photons    = %8d\n#\n", PHOTONS);
 
-    // configure RNG
-    srand(SEED);
-    // Xorshift128+ generator initialization
-    Xorshift128Plus rng;
-    xorshift128plus_init(&rng, (uint64_t)SEED, (uint64_t)(SEED + rand()));
+    // Xorshift32 generator initialization
+    Xorshift32 rng;
+    xorshift32_init(&rng);
+    Photons p;
     // start timer
     float start = wtime();
     // simulation
-    for (unsigned int i = 0; i < PHOTONS; ++i) {
-        photon(&rng, heat, heat2);
+    for (size_t i = 0; i < PHOTONS; i += 8) {
+        photon8(&rng, &p, heat, heat2, i);
     }
     // stop timer
     float end = wtime();

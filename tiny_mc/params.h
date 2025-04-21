@@ -1,13 +1,11 @@
 #pragma once
 
-#include <time.h> // time
-
 #ifndef SHELLS
 #define SHELLS 101 // discretization level
 #endif
 
 #ifndef PHOTONS
-#define PHOTONS 32768 // 32K photons
+#define PHOTONS 67108864UL // 64M photons
 #endif
 
 #ifndef MU_A
@@ -25,4 +23,5 @@
 #ifndef SEED
 #define SEED (time(NULL)) // random seed
 #endif
+
 
