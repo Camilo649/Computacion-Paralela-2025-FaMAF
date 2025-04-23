@@ -6,12 +6,9 @@
  */
 
 #define _XOPEN_SOURCE 500 // M_PI
-<<<<<<< HEAD
-#include <GL/glew.h>    // Inclui esta libreria
-=======
 
+#include <GL/glew.h>
 #include "xorshift32.h"
->>>>>>> refs/remotes/origin/main
 #include "params.h"
 #include "photon.h"
 #include "wtime.h"
