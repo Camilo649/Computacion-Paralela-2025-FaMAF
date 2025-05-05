@@ -2,7 +2,7 @@ Compilador: icx
 Flags: -g -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto -DSEED=1234567
 Ejecucion: ./headless
 Compilacion: Makefile
-Cambios: Cambios: rand por XorShift128+
+Cambios: rand por XorShift128+
 
 Resultados:
 
