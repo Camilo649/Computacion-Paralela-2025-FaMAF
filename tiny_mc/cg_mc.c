@@ -159,7 +159,10 @@ int main(void)
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        update(&rng);
+        #pragma omp parallel num_threads(THREADS)
+        {
+            update(&rng);
+        }
 
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLES, 0, 6);

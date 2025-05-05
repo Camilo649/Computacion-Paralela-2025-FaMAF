@@ -11,12 +11,12 @@
 #include "xorshift32.h"
 #include "params.h"
 #include "photon.h"
-#include "wtime.h"
 
 #include <assert.h>
 // #include <math.h>
 #include <stdio.h>
 // #include <stdlib.h>
+#include <omp.h>
 
 // char t1[] = "Tiny Monte Carlo by Scott Prahl (http://omlc.ogi.edu)";
 // char t2[] = "1 W Point Source Heating in Infinite Isotropic Scattering Medium";
@@ -26,7 +26,6 @@
 // global state, heat and heat square in each shell
 float heat[SHELLS] = { 0 };
 float heat2[SHELLS] = { 0 };
-
 
 /***
  * Main matter
@@ -41,19 +40,44 @@ int main(void)
     // printf("# Photons    = %8d\n#\n", PHOTONS);
 
     // Xorshift32 generator initialization
-    Xorshift32 rng;
-    xorshift32_init(&rng);
-    Photons p;
     // start timer
-    float start = wtime();
+    double start = omp_get_wtime();
     // simulation
-    for (size_t i = 0; i < PHOTONS; i += 8) {
-        photon8(&rng, &p, heat, heat2, i);
+    #pragma omp parallel num_threads(THREADS)
+    {
+        // Inicialización del generador de números aleatorios por hilo
+        int tid = omp_get_thread_num();
+        Xorshift32 rng;
+        xorshift32_init(&rng);
+    
+        size_t base = tid * PHOTONS_BLOCK;
+    
+        Photons *p = malloc(sizeof(Photons));
+        assert(p);
+
+        // Variables locales para cada hilo
+        float local_heat[SHELLS] = {0};
+        float local_heat2[SHELLS] = {0};
+    
+        for (size_t i = 0; i < PHOTONS_BLOCK; i += 8) {
+            photon8(&rng, p, local_heat, local_heat2, base + i);
+        }
+    
+        // Reducción global: combinamos los resultados locales con los globales
+        #pragma omp critical
+        {
+            for (int i = 0; i < SHELLS; i++) {
+                heat[i] += local_heat[i];
+                heat2[i] += local_heat2[i];
+            }
+        }
+
+        free(p);
     }
     // stop timer
-    float end = wtime();
+    double end = omp_get_wtime();
     assert(start <= end);
-    float elapsed = end - start;
+    double elapsed = end - start;
 
     // printf("# %f seconds\n", elapsed);
     printf("%f\n", 1e-3 * PHOTONS / elapsed);

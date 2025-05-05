@@ -8,6 +8,14 @@
 #define PHOTONS 67108864UL // 64M photons
 #endif
 
+#ifndef THREADS
+#define THREADS 12UL
+#endif
+
+#ifndef PHOTONS_BLOCK
+#define PHOTONS_BLOCK PHOTONS/THREADS
+#endif
+
 #ifndef MU_A
 #define MU_A 2.0f // Absorption Coefficient in 1/cm !!non-zero!!
 #endif
