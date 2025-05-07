@@ -5,11 +5,11 @@
 #endif
 
 #ifndef PHOTONS
-#define PHOTONS 68719476736UL // 64G photons
+#define PHOTONS 67108864UL // 1G photons
 #endif
 
 #ifndef THREADS
-#define THREADS 96UL
+#define THREADS 12UL
 #endif
 
 #ifndef PHOTONS_BLOCK

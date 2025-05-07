@@ -43,27 +43,22 @@ int main(void)
     // start timer
     double start = omp_get_wtime();
     // simulation
-    #pragma omp parallel num_threads(THREADS)
+    #pragma omp parallel
     {
-        // Inicialización del generador de números aleatorios por hilo
-        int tid = omp_get_thread_num();
         Xorshift32 rng;
         xorshift32_init(&rng);
     
-        size_t base = tid * PHOTONS_BLOCK;
-    
         Photons *p = malloc(sizeof(Photons));
         assert(p);
-
-        // Variables locales para cada hilo
+    
         float local_heat[SHELLS] = {0};
         float local_heat2[SHELLS] = {0};
     
-        for (size_t i = 0; i < PHOTONS_BLOCK; i += 8) {
-            photon8(&rng, p, local_heat, local_heat2, base + i);
+        #pragma omp for schedule(dynamic)
+        for (size_t i = 0; i < PHOTONS; i += 8) {
+            photon8(&rng, p, local_heat, local_heat2, i);
         }
     
-        // Reducción global: combinamos los resultados locales con los globales
         #pragma omp critical
         {
             for (int i = 0; i < SHELLS; i++) {
@@ -71,7 +66,7 @@ int main(void)
                 heat2[i] += local_heat2[i];
             }
         }
-
+    
         free(p);
     }
     // stop timer
