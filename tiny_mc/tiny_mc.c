@@ -54,7 +54,7 @@
          float local_heat[SHELLS] = {0};
          float local_heat2[SHELLS] = {0};
      
-         #pragma omp for schedule(dynamic)
+         #pragma omp for schedule(dynamic,CHUNK_SIZE)
          for (size_t i = 0; i < PHOTONS; i += 8) {
              photon8(&rng, p, local_heat, local_heat2, i);
          }
@@ -75,7 +75,7 @@
      double elapsed = end - start;
  
      // printf("# %f seconds\n", elapsed);
-     printf("%f\n", 1e-3 * PHOTONS / elapsed);
+     printf("%f\n", 1e-6 * PHOTONS / elapsed);
  
      // printf("# Radius\tHeat\n");
      // printf("# [microns]\t[W/cm^3]\tError\n");
