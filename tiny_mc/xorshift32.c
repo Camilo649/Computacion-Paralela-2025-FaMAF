@@ -18,7 +18,7 @@ void xorshift32_init(Xorshift32* rng)
 {
     int tid = omp_get_thread_num();
     for (int i = 0; i < 8; ++i) {
-        rng->state[i] = splitmix32(SEED + tid);
+        rng->state[i] = splitmix32(SEED + tid + i);
     }
 }
 
