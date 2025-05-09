@@ -7,7 +7,7 @@ Cambios: Multithreading estático con openmp
 Resultados:
 
 PHOTONS  Mphotons/seg
-32G 	 84.438959127
+16G 	 84.550646071
 
 
 
