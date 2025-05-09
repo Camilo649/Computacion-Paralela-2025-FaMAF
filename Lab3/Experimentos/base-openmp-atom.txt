@@ -2,12 +2,12 @@ Compilador: icx
 Flags: -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto -fvectorize -funsafe-math-optimizations -fimf-use-svml=1 -fno-stack-protector -mavx2 -falign-functions=32 -fstrict-aliasing -qopenmp -DSEED=1234567
 Ejecucion: ./headless
 Compilacion: Makefile
-Cambios: Multithreading con openmp
+Cambios: Multithreading estático con openmp
 
 Resultados:
 
 PHOTONS  Mphotons/seg
-64G 	 110.544235231
+32G 	 84.438959127
 
 
 

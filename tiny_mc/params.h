@@ -5,7 +5,7 @@
 #endif
 
 #ifndef PHOTONS
-#define PHOTONS 67108864UL // 1G photons
+#define PHOTONS 536870912UL // 1G photons
 #endif
 
 #ifndef THREADS

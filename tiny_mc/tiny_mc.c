@@ -27,10 +27,6 @@
 float heat[SHELLS] = { 0 };
 float heat2[SHELLS] = { 0 };
 
-/***
- * Main matter
- ***/
-
 int main(void)
 {
     // heading
@@ -39,17 +35,19 @@ int main(void)
     // printf("# Absorption = %8.3f/cm\n", MU_A);
     // printf("# Photons    = %8d\n#\n", PHOTONS);
 
-    // Xorshift32 generator initialization
     // start timer
     double start = omp_get_wtime();
+
+    Photons *p = aligned_alloc(32, sizeof(Photons));
+    assert(p);
+
+    assert(p);
+
     // simulation
-    #pragma omp parallel
+    #pragma omp parallel num_threads(THREADS)
     {
         Xorshift32 rng;
         xorshift32_init(&rng);
-    
-        Photons *p = malloc(sizeof(Photons));
-        assert(p);
     
         float local_heat[SHELLS] = {0};
         float local_heat2[SHELLS] = {0};
@@ -66,15 +64,16 @@ int main(void)
                 heat2[i] += local_heat2[i];
             }
         }
-    
-        free(p);
     }
+
+    free(p);
+
     // stop timer
     double end = omp_get_wtime();
     assert(start <= end);
     double elapsed = end - start;
 
-    // printf("# %f seconds\n", elapsed);
+    printf("# %f seconds\n", elapsed);
     printf("%f\n", 1e-3 * PHOTONS / elapsed);
 
     // printf("# Radius\tHeat\n");

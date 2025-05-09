@@ -2,6 +2,7 @@
 #include "params.h"
 #include <immintrin.h>
 #include <time.h>
+#include <omp.h>
 
 // Funcion auxiliar para mezclar las semillas
 uint32_t splitmix32(uint32_t x) {
@@ -15,8 +16,9 @@ uint32_t splitmix32(uint32_t x) {
 // Inicialización del generador Xorshift32
 void xorshift32_init(Xorshift32* rng)
 {
+    int tid = omp_get_thread_num();
     for (int i = 0; i < 8; ++i) {
-        rng->state[i] = splitmix32(SEED + i);
+        rng->state[i] = splitmix32(SEED + tid);
     }
 }
 
