@@ -8,8 +8,12 @@
 #define PHOTONS 268435456UL // 1G photons
 #endif
 
+#ifndef THREADS
+#define THREADS 48UL // 1G photons
+#endif
+
 #ifndef CHUNK_SIZE
-#define CHUNK_SIZE 1UL
+#define CHUNK_SIZE 16UL
 #endif
 
 #ifndef MU_A

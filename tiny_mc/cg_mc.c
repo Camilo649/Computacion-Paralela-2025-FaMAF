@@ -5,17 +5,19 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <omp.h>
 
 #include "xorshift32.h"
 #include "photon.h"
 #include "params.h"
 
-#define PHOTON_CAP 1 << 16
+#define PHOTON_CAP 1 << 8
 #define MAX_PHOTONS_PER_FRAME 20
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
 
 static float heats[SHELLS];
 static float _heats_squared[SHELLS];
-static int remaining_photons = PHOTON_CAP;
+static int remaining_photons = PHOTONS;
 
 // clang-format off
 // covers the entire screen with 2 triangles
@@ -71,28 +73,42 @@ static const char *FSHADER = ""
 ;
 // clang-format on
 
-void update(Xorshift32* rng)
+void update()
 {
     if (remaining_photons <= 0) {
         return;
     }
 
-    int remaining_photons_in_frame = MAX_PHOTONS_PER_FRAME;
+    float local_heats[THREADS][SHELLS] = {0};
+    float local_heats_squared[THREADS][SHELLS] = {0};
 
-    Photons p;
-    size_t index = 0;
+    #pragma omp parallel
+    {
+        int tid = omp_get_thread_num();
+        Xorshift32 rng;
+        xorshift32_init(&rng);
+        Photons p;
 
-    while (remaining_photons > 0 && remaining_photons_in_frame > 0) {
-        --remaining_photons;
-        --remaining_photons_in_frame;
-
-        photon8(rng, &p, heats, _heats_squared, index%PHOTONS);
-
-        index += 8;
+        #pragma omp for schedule(guided, CHUNK_SIZE)
+        for (int i = 0; i < PHOTON_CAP; i++) {
+            size_t index = i * 8; // cada llamada a photon8 procesa 8 fotones
+            photon8(&rng, &p, local_heats[tid], local_heats_squared[tid], index);
+        }
     }
+
+    // Reducción manual post-paralelismo
+    for (unsigned long t = 0; t < THREADS; t++) {
+        for (int i = 0; i < SHELLS; i++) {
+            heats[i] += local_heats[t][i];
+            _heats_squared[i] += local_heats_squared[t][i];
+        }
+    }
+
+    remaining_photons -= PHOTON_CAP;
 
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(heats), heats);
 }
+
 
 int main(void)
 {
@@ -152,17 +168,10 @@ int main(void)
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(heats), heats, GL_DYNAMIC_DRAW);
 
-    // Inicialización del generador Xorshift32
-    Xorshift32 rng;
-    xorshift32_init(&rng);
-
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        #pragma omp parallel num_threads(THREADS)
-        {
-            update(&rng);
-        }
+        update();
 
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLES, 0, 6);
