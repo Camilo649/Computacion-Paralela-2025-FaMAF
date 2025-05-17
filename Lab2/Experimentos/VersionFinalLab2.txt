@@ -6,7 +6,7 @@ Cambios: Vectorizacion con intrinsics
 
 Resultados:
 
-PHOTONS   Kphotons/seg
-134217728 2033.601939
+PHOTONS   Mphotons/seg
+134217728 2.033601939
 
 

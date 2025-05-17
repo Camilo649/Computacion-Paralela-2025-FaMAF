@@ -43,7 +43,7 @@
      // start timer
      double start = omp_get_wtime();
      // simulation
-     #pragma omp parallel
+     #pragma omp parallel num_threads(THREADS)
      {
          Xorshift32 rng;
          xorshift32_init(&rng);
