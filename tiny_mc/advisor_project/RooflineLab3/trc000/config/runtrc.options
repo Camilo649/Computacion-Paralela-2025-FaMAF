@@ -1,0 +1,13 @@
+-r
+/users/cp2025/cp2025_014/Computacion-Paralela-2025-FaMAF/tiny_mc/advisor_project/e000/trc000
+-quiet
+-cs-file
+/users/cp2025/cp2025_014/Computacion-Paralela-2025-FaMAF/tiny_mc/advisor_project/e000/callstacks.def
+--cs-mode=count-loops,count-flops,stl-profiling,stack-stitching
+--count-flops
+--benchmarks=dram,mcdram,cpu_cache,flop_peak,int,
+--jit-profiling
+--gpu-kernel-of-interest=*
+--target-gpu=none
+--
+./headless
