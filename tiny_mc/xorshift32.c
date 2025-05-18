@@ -12,7 +12,6 @@ uint32_t splitmix32(uint32_t x) {
     return x ^ (x >> 16);
 }
 
-
 // Inicialización del generador Xorshift32
 void xorshift32_init(Xorshift32* rng)
 {
