@@ -47,15 +47,14 @@ int main(void)
         Xorshift32 rng;
         xorshift32_init(&rng);
      
-        Photons *p = malloc(sizeof(Photons));
-        assert(p);
+        Photons p
      
         float local_heat[SHELLS] = {0};
         float local_heat2[SHELLS] = {0};
      
         #pragma omp for schedule(guided,CHUNK_SIZE)
         for (size_t i = 0; i < PHOTONS; i += 8) {
-            photon8(&rng, p, local_heat, local_heat2, i);
+            photon8(&rng, &p, local_heat, local_heat2, i);
         }
      
         #pragma omp critical
@@ -65,8 +64,6 @@ int main(void)
                 heat2[i] += local_heat2[i];
             }
         }
-     
-        free(p);
     }
     // stop timer
     double end = omp_get_wtime();
