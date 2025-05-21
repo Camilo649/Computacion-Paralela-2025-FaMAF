@@ -47,7 +47,7 @@ int main(void)
         Xorshift32 rng;
         xorshift32_init(&rng);
      
-        Photons p
+        Photons p;
      
         float local_heat[SHELLS] = {0};
         float local_heat2[SHELLS] = {0};
