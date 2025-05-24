@@ -41,20 +41,19 @@ int main(void)
  
     // start timer
     double start = omp_get_wtime();
+
     // simulation
     #pragma omp parallel num_threads(THREADS)
     {
         Xorshift32 rng;
         xorshift32_init(&rng);
      
-        Photons p;
-     
         float local_heat[SHELLS] = {0};
         float local_heat2[SHELLS] = {0};
      
-        #pragma omp for schedule(guided,CHUNK_SIZE)
-        for (size_t i = 0; i < PHOTONS; i += 8) {
-            photon8(&rng, &p, local_heat, local_heat2, i);
+        #pragma omp for schedule(static)
+        for (size_t i = 0; i < PHOTONS/8; i += 1) {
+            photon8(&rng, local_heat, local_heat2, 1);
         }
      
         #pragma omp critical
@@ -65,6 +64,7 @@ int main(void)
             }
         }
     }
+
     // stop timer
     double end = omp_get_wtime();
     assert(start <= end);
@@ -85,3 +85,4 @@ int main(void)
  
     return 0;
 }
+
