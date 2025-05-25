@@ -71,28 +71,49 @@ static const char *FSHADER = ""
 ;
 // clang-format on
 
-void update(Xorshift32* rng)
+void update(void)
 {
     if (remaining_photons <= 0) {
         return;
     }
 
-    int remaining_photons_in_frame = MAX_PHOTONS_PER_FRAME;
+    int photons_this_frame = MAX_PHOTONS_PER_FRAME;
+    if (photons_this_frame > remaining_photons) {
+        photons_this_frame = remaining_photons;
+    }
+    remaining_photons -= photons_this_frame;
 
-    Photons p;
-    size_t index = 0;
-
-    while (remaining_photons > 0 && remaining_photons_in_frame > 0) {
-        --remaining_photons;
-        --remaining_photons_in_frame;
-
-        photon8(rng, &p, heats, _heats_squared, index%PHOTONS);
-
-        index += 8;
+    // Cantidad de iteraciones necesarias para cubrir photons_this_frame fotones en bloques de 8*CHUNK_SIZE
+    size_t total_iterations = photons_this_frame / (8 * CHUNK_SIZE);
+    if (photons_this_frame % (8 * CHUNK_SIZE) != 0) {
+        total_iterations += 1;  // cubrir residuos si no es múltiplo exacto
     }
 
-    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(heats), heats);
+    // Reducción paralela
+    #pragma omp parallel
+    {
+        Xorshift32 rng;
+        xorshift32_init(&rng);
+
+        float local_heat[SHELLS] = {0};
+        float local_heat2[SHELLS] = {0};
+
+        #pragma omp for schedule(dynamic)
+        for (size_t i = 0; i < total_iterations; ++i) {
+            photon8(&rng, local_heat, local_heat2, CHUNK_SIZE);
+        }
+
+        #pragma omp critical
+        {
+            for (int j = 0; j < SHELLS; ++j) {
+                heats[j] += local_heat[j];
+                _heats_squared[j] += local_heat2[j];
+            }
+	    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(heats), heats);
+        }
+    }
 }
+
 
 int main(void)
 {
@@ -152,17 +173,10 @@ int main(void)
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(heats), heats, GL_DYNAMIC_DRAW);
 
-    // Inicialización del generador Xorshift32
-    Xorshift32 rng;
-    xorshift32_init(&rng);
-
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        #pragma omp parallel num_threads(THREADS)
-        {
-            update(&rng);
-        }
+        update();
 
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLES, 0, 6);

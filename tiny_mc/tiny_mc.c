@@ -42,25 +42,26 @@ int main(void)
     // start timer
     double start = omp_get_wtime();
 
-    // simulation
-    #pragma omp parallel num_threads(THREADS)
+    #pragma omp parallel
     {
         Xorshift32 rng;
         xorshift32_init(&rng);
-     
+
         float local_heat[SHELLS] = {0};
         float local_heat2[SHELLS] = {0};
-     
-        #pragma omp for schedule(static)
-        for (size_t i = 0; i < PHOTONS/8; i += 1) {
-            photon8(&rng, local_heat, local_heat2, 1);
+
+	size_t total_iterations = PHOTONS / (8 * CHUNK_SIZE);
+
+        #pragma omp for schedule(dynamic)
+        for (size_t i = 0; i < total_iterations; ++i) {
+            photon8(&rng, local_heat, local_heat2, CHUNK_SIZE);
         }
-     
+
         #pragma omp critical
         {
-            for (int i = 0; i < SHELLS; i++) {
-                heat[i] += local_heat[i];
-                heat2[i] += local_heat2[i];
+            for (int j = 0; j < SHELLS; ++j) {
+                heat[j] += local_heat[j];
+                heat2[j] += local_heat2[j];
             }
         }
     }

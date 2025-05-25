@@ -12,8 +12,8 @@ OUTPUT_FILE="results.csv"
 # Escribir encabezado
 echo "CHUNK_SIZE,Mphotons/seg" > "$OUTPUT_FILE"
 
-# Iterar hasta CHUNK_SIZE = 2^28
-while [ "$CHUNK_SIZE" -le $((1 << 28)) ]; do
+# Iterar hasta CHUNK_SIZE = 2^19
+while [ "$CHUNK_SIZE" -le $((1 << 19)) ]; do
     echo "Running with CHUNK_SIZE=$CHUNK_SIZE"
 
     # Limpiar y compilar con CHUNK_SIZE y PHOTONS
