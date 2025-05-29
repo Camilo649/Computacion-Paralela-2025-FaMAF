@@ -50,7 +50,7 @@ int main(void)
         float local_heat[SHELLS] = {0};
         float local_heat2[SHELLS] = {0};
 
-	size_t total_iterations = PHOTONS / (8 * CHUNK_SIZE);
+	    size_t total_iterations = PHOTONS / (8 * CHUNK_SIZE);
 
         #pragma omp for schedule(dynamic)
         for (size_t i = 0; i < total_iterations; ++i) {
