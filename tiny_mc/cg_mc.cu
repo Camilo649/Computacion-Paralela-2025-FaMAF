@@ -1,12 +1,14 @@
 #include <assert.h>
 #include <stdio.h>
+#include <cuda_runtime.h>
+#include <cuda_gl_interop.h>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "params.h"
-#include "photon.h"
-#include "xorshift32.h"
+#include "photon.cuh"
+#include "xorshift32.cuh"
 
 #define PHOTON_CAP 1 << 16
 #define MAX_PHOTONS_PER_FRAME 20
@@ -15,80 +17,86 @@ static float heats[SHELLS];
 static float _heats_squared[SHELLS];
 static int remaining_photons = PHOTON_CAP;
 
+static cudaGraphicsResource* cuda_heats_resource;
+static cudaGraphicsResource* cuda_heats_squared_resource;
+static GLuint ssbo;
+static GLuint ssbo_squared;
+
+__global__ void simulate_kernel(float* heats, float* heats_squared)
+{
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid >= PHOTONS) return;
+    Xorshift32 rng;
+    xorshift32_init(&rng, (SEED ^ tid) + 1);  // semilla única por hilo
+    photon(heats, heats_squared, &rng);
+}
+
+void launch_photon_simulation(float* heats_dev, float* heats_squared_dev, int photons_this_frame) {
+    int blocks = (photons_this_frame + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    photon_kernel<<<blocks, THREADS_PER_BLOCK>>>(heats_dev, heats_squared_dev, photons_this_frame);
+    cudaDeviceSynchronize();
+}
+
 // clang-format off
-// covers the entire screen with 2 triangles
 static const char *VSHADER = ""
 "#version 430\n"
-
 "vec2 vertices[4] = {\n"
 "    {-1.0,  1.0},\n"
 "    {-1.0, -1.0},\n"
 "    { 1.0, -1.0},\n"
 "    { 1.0,  1.0}\n"
 "};\n"
-
 "uint indices[6] = {0, 1, 2, 0, 2, 3};\n"
-
 "void main() {\n"
 "    gl_Position = vec4(vertices[indices[gl_VertexID]], 0.0, 1.0);\n"
-"}"
-;
+"}";
 
-// maps a pixel to an array index based on it's distance from the origin and
-// the heat value of that index to a shade of red
 static const char *FSHADER = ""
 "#version 430\n"
-
-// magic constant - max distance from origin = length(+/-vec2(0.5))
 "#define MC 0.7071067811865476f\n"
-
 "out vec4 frag_color;\n"
-
 "layout(std430, binding = 0) readonly buffer ssbo {\n"
 "    float heats[];\n"
 "} shells;\n"
-
 "void main() {\n"
 "    vec2 uv = gl_FragCoord.xy / vec2(800);\n"
-
 "    float dr = length(uv - vec2(0.5));\n"
-
 "    int heat_id = int((dr / MC) * float(shells.heats.length() - 1));\n"
-
 "    float heat = shells.heats[heat_id];\n"
-
-    // logistic functions to put less weight in the difference between huge colors
-    // try plotting it in a graph calculator, see what happens with different k's
 "    float L = 2.0;\n"
 "    float b = 1.0;\n"
 "    float k = 0.004;\n"
 "    float heat_fit = L / (1.0 + b * exp(-k * heat)) - 1.0;\n"
-
 "    frag_color = vec4(heat_fit, 0.0, 0.0, 1.0);\n"
-"}"
-;
+"}";
 // clang-format on
 
-void update(Xorshift32 * restrict rng)
-{
-    if (remaining_photons <= 0) {
-        return;
-    }
+void update() {
+    if (remaining_photons <= 0) return;
 
-    int remaining_photons_in_frame = MAX_PHOTONS_PER_FRAME;
+    int photons_this_frame = MAX_PHOTONS_PER_FRAME;
+    if (photons_this_frame > remaining_photons)
+        photons_this_frame = remaining_photons;
 
-    while (remaining_photons > 0 && remaining_photons_in_frame > 0) {
-        --remaining_photons;
-        --remaining_photons_in_frame;
+    float* d_heats = NULL;
+    float* d_heats_squared = NULL;
+    size_t bytes;
 
-        photon(heats, _heats_squared, rng);
-    }
+    cudaGraphicsMapResources(1, &cuda_heats_resource, 0);
+    cudaGraphicsResourceGetMappedPointer((void**)&d_heats, &bytes, cuda_heats_resource);
 
-    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(heats), heats);
+    cudaGraphicsMapResources(1, &cuda_heats_squared_resource, 0);
+    cudaGraphicsResourceGetMappedPointer((void**)&d_heats_squared, &bytes, cuda_heats_squared_resource);
+
+    launch_photon_simulation(d_heats, d_heats_squared, photons_this_frame);
+
+    cudaGraphicsUnmapResources(1, &cuda_heats_resource, 0);
+    cudaGraphicsUnmapResources(1, &cuda_heats_squared_resource, 0);
+
+    remaining_photons -= photons_this_frame;
 }
 
-int main(void)
-{
+int main(void) {
     glfwInit();
 
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -139,20 +147,23 @@ int main(void)
 
     glfwShowWindow(window);
 
-    GLuint ssbo;
     glGenBuffers(1, &ssbo);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(heats), heats, GL_DYNAMIC_DRAW);
 
-    // configure RNG
-    Xorshift32 rng;
-    xorshift32_init(&rng, SEED);
+    glGenBuffers(1, &ssbo_squared);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_squared);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo_squared);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(_heats_squared), _heats_squared, GL_DYNAMIC_DRAW);
+
+    cudaGraphicsGLRegisterBuffer(&cuda_heats_resource, ssbo, cudaGraphicsMapFlagsWriteDiscard);
+    cudaGraphicsGLRegisterBuffer(&cuda_heats_squared_resource, ssbo_squared, cudaGraphicsMapFlagsWriteDiscard);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        update(&rng);
+        update();
 
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -160,7 +171,11 @@ int main(void)
         glfwSwapBuffers(window);
     }
 
+    cudaGraphicsUnregisterResource(cuda_heats_resource);
+    cudaGraphicsUnregisterResource(cuda_heats_squared_resource);
+
     glDeleteBuffers(1, &ssbo);
+    glDeleteBuffers(1, &ssbo_squared);
     glDeleteVertexArrays(1, &vao);
     glDeleteProgram(program);
     glfwDestroyWindow(window);
