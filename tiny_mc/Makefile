@@ -3,14 +3,14 @@ NVCC = nvcc
 
 # Flags
 NVFLAGS = -O3 -use_fast_math -lineinfo -Xcompiler "-fno-stack-protector -funroll-loops -ffast-math -fstrict-aliasing" \
-          -arch=sm_61 -code=sm_61 -restrict -Xptxas "-O3 -v" -DSEED=666666
+          -arch=compute_61 -code=sm_61 -restrict -Xptxas "-O3 -v" -DSEED=666666
 TINY_LDFLAGS = -lm
 CG_LDFLAGS = -lm -lglfw -lGL -lGLEW
 
 TARGETS = headless head
 
 # Files
-C_SOURCES = photon.cu xorshift32.cu
+C_SOURCES = tiny_mc.cu
 C_OBJS = $(patsubst %.cu, %.o, $(C_SOURCES))
 
 # Default rules

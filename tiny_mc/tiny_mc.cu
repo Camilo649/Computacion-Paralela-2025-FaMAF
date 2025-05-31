@@ -7,16 +7,15 @@
 #include "xorshift32.cuh"
 
 
-__global__ void simulate_kernel(float* heats, float* heats_squared, unsigned int photons, unsigned int seed)
+__global__ void simulate_kernel(float* heats, float* heats_squared)
 {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid >= photons) return;
-
+    if (tid >= PHOTONS) return;
     Xorshift32 rng;
-    xorshift32_init(&rng, seed ^ tid);  // semilla única por hilo
-
+    xorshift32_init(&rng, (SEED ^ tid) + 1);  // semilla única por hilo
     photon(heats, heats_squared, &rng);
 }
+
 
 int main()
 {
@@ -29,13 +28,13 @@ int main()
     cudaMemset(d_heats, 0, size);
     cudaMemset(d_heats_squared, 0, size);
 
-    double elapsed_time;
+    float elapsed_time;
     cudaEvent_t e1, e2;
     cudaEventCreate(&e1);
     cudaEventCreate(&e2);
     cudaEventRecord(e1);
 
-    simulate_kernel<<<PHOTONS/THREADS_PER_BLOCK, THREADS_PER_BLOCK>>>(d_heats, d_heats_squared, num_photons, SEED);
+    simulate_kernel<<<PHOTONS/THREADS_PER_BLOCK, THREADS_PER_BLOCK>>>(d_heats, d_heats_squared);
     cudaDeviceSynchronize();
 
     cudaEventRecord(e2);
@@ -44,12 +43,15 @@ int main()
 
     float* heats = (float*)malloc(size);
     cudaMemcpy(heats, d_heats, size, cudaMemcpyDeviceToHost);
+    float* heats_squared = (float*)malloc(size);
+    cudaMemcpy(heats_squared, d_heats_squared, size, cudaMemcpyDeviceToHost);
 
-    printf("%f\n", 1e-3 * PHOTONS / elapsed_time); // Kfotones / ms
+    printf("%f\n", PHOTONS / (1000.0f * elapsed_time));
 
     cudaFree(d_heats);
     cudaFree(d_heats_squared);
     free(heats);
+    free(heats_squared);
 
     return 0;
 }

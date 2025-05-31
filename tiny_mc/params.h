@@ -7,7 +7,7 @@
 #endif
 
 #ifndef PHOTONS
-#define PHOTONS 67108864UL // 64M photons
+#define PHOTONS 8589934592UL // 8G photons
 #endif
 
 #ifndef MU_A
