@@ -1,19 +1,13 @@
 #pragma once
 
+#include <time.h> // time
+
 #ifndef SHELLS
 #define SHELLS 101 // discretization level
 #endif
 
 #ifndef PHOTONS
-#define PHOTONS 17179869184UL // 16G photons
-#endif
-
-#ifndef THREADS
-#define THREADS 48UL
-#endif
-
-#ifndef CHUNK_SIZE
-#define CHUNK_SIZE 128UL
+#define PHOTONS 67108864UL // 64M photons
 #endif
 
 #ifndef MU_A
@@ -25,11 +19,10 @@
 #endif
 
 #ifndef MICRONS_PER_SHELL
-#define MICRONS_PER_SHELL 25 // Thickness of spherical shells in microns
+#define MICRONS_PER_SHELL 50 // Thickness of spherical shells in microns
 #endif
 
 #ifndef SEED
-#define SEED (time(NULL)) // random seed
+#define SEED ((uint32_t)(time(NULL) & 0xFFFFFFFF)) // Random seed
 #endif
-
 

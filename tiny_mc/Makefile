@@ -2,7 +2,7 @@
 CC = icx
 
 # Flags
-CFLAGS = -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto -fvectorize -funsafe-math-optimizations -fimf-use-svml=1 -fno-stack-protector -mavx2 -falign-functions=32 -fstrict-aliasing -qopenmp -DSEED=1234567
+CFLAGS = -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto -fvectorize -funsafe-math-optimizations -fno-stack-protector -mavx2 -falign-functions=32 -fstrict-aliasing -DSEED=666666
 TINY_LDFLAGS = -lm
 CG_LDFLAGS = -lm -lglfw -lGL -lGLEW
 
@@ -12,7 +12,7 @@ CG_LDFLAGS = -lm -lglfw -lGL -lGLEW
 TARGETS = headless head
 
 # Files
-C_SOURCES = photon.c xorshift32.c
+C_SOURCES = photon.c wtime.c xorshift32.c
 C_OBJS = $(patsubst %.c, %.o, $(C_SOURCES))
 
 # VTune analysis

@@ -1,0 +1,9 @@
+
+29721 : 0x910ebe0fbbe : 3 : logger_init :  LOG FILE OPENED (by collectunits.logger), level: 4
+29721 : 0x910ebe2ee62 : 4 : pytrace_try_probe_python_functions :  Python version is detected as == 0x0
+29721 : 0x910ec6a80f6 : 4 : pytrace_try_probe_python_functions :  Python version is detected as == 0x0
+29721 : 0x910ed857b1d : 4 : pytrace_try_probe_python_functions :  Python version is detected as == 0x0
+29721 : 0x910f41e6ac1 : 4 : pytrace_try_probe_python_functions :  Python version is detected as == 0x0
+29721 : 0x910f4643adc : 4 : pytrace_start_profiling :  [CALLED]
+29721 : 0x91108d88415 : 4 : pytrace_stop_profiling :  [CALLED]
+29721 : 0x91108d8e825 : 3 : logger_fini :  LOG FILE CLOSED (by collectunits.logger)
