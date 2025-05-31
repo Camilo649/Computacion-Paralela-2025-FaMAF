@@ -1,4 +1,4 @@
-#include "xorshift32.h"
+#include "xorshift32.cuh"
 
 #pragma once
 
@@ -10,4 +10,4 @@
 * @param heats_squared     Arreglo que acumula el cuadrado de la energía absorbida (para varianza).
 * @param rng               Puntero al generador de números aleatorios (Xorshift32).
 */
-int photon(float *heats, float *heats_squared, Xorshift32 * restrict rng);
+__device__ void photon(float* heats, float* heats_squared, Xorshift32* rng)

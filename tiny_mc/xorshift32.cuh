@@ -1,14 +1,14 @@
-#ifndef XORSHIFT32_H
-#define XORSHIFT32_H
+#ifndef XORSHIFT32_CUH
+#define XORSHIFT32_CUH
 
 #include <stdint.h>
 
 /**
 * @brief Estructura para almacenar el estado del generador Xorshift32.
 */
-typedef struct {
+typedef Xorshift32 {
     uint32_t state;
-} Xorshift32;
+}
 
 
 /**
@@ -19,15 +19,8 @@ typedef struct {
 * 
 * @note seed debe ser un valor != 0
 */
-void xorshift32_init(Xorshift32 * restrict rng, uint32_t seed);
+__device__ void xorshift32_init(Xorshift32* rng, uint32_t seed);
 
-/**
-* @brief Genera el siguiente número aleatorio de 32 bits utilizando Xorshift32.
-* 
-* @param rng Puntero al generador Xorshift32 que mantiene el estado..
-* @return uint32_t El siguiente número aleatorio de 32 bits.
-*/
-uint32_t xorshift32(Xorshift32 * restrict rng);
 
 /**
 * @brief Genera un número aleatorio de punto flotante en el rango [0, 1) utilizando Xorshift32.
@@ -35,6 +28,6 @@ uint32_t xorshift32(Xorshift32 * restrict rng);
 * @param rng Puntero al generador Xorshift32 que mantiene el estado.
 * @return float Un número aleatorio de punto flotante en el rango [0, 1).
 */
-float xorshift32_norm(Xorshift32 * restrict rng);
+__device__ float xorshift32_norm(Xorshift32* rng);
 
-#endif // XORSHIFT32_H
+#endif // XORSHIFT32_CUH

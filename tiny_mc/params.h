@@ -26,3 +26,7 @@
 #define SEED ((uint32_t)(time(NULL) & 0xFFFFFFFF)) // Random seed
 #endif
 
+#ifndef THREADS_PER_BLOCK
+#define THREADS_PER_BLOCK 256UL
+#endif
+
