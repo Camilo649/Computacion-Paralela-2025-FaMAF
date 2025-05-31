@@ -2,7 +2,7 @@
 #include <curand_kernel.h>
 #include <stdint.h>
 
-#define N (1024 * 1024)  // total números a generar
+#define N (2<<24)  // total números a generar
 #define THREADS_PER_BLOCK 256
 
 // Estado global para xorshift (un estado por hilo)
@@ -104,3 +104,4 @@ int main() {
 
     return 0;
 }
+

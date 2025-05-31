@@ -52,7 +52,7 @@ int main(void)
     float elapsed = end - start;
 
     // printf("# %f seconds\n", elapsed);
-    printf("%f\n", 1e-3 * PHOTONS / elapsed);
+    printf("%f\n", 1e-6 * PHOTONS / elapsed);
 
     // printf("# Radius\tHeat\n");
     // printf("# [microns]\t[W/cm^3]\tError\n");
