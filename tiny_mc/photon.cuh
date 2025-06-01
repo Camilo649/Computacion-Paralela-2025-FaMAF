@@ -39,7 +39,7 @@ __device__ __forceinline__ void photon(float* heats, float* heats_squared, Xorsh
             xi1 = 2.0f * xorshift32_norm(rng) - 1.0f;
             xi2 = 2.0f * xorshift32_norm(rng) - 1.0f;
             t = xi1 * xi1 + xi2 * xi2;
-        } while (t > 1.0f);
+        } while (1.0f < t);
         u = 2.0f * t - 1.0f;
         float sqrt_term = sqrtf((1.0f - u * u) / t);
         v = xi1 * sqrt_term;

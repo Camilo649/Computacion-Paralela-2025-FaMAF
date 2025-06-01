@@ -9,19 +9,23 @@ CG_LDFLAGS = -lm -lglfw -lGL -lGLEW
 
 TARGETS = headless head
 
-# Files
-C_SOURCES = tiny_mc.cu
-C_OBJS = $(patsubst %.cu, %.o, $(C_SOURCES))
+# Sources
+TINY_SOURCES = tiny_mc.cu
+CG_SOURCES = cg_mc.cu
+
+# Object files
+TINY_OBJS = $(patsubst %.cu, %.o, $(TINY_SOURCES))
+CG_OBJS = $(patsubst %.cu, %.o, $(CG_SOURCES))
 
 # Default rules
 %.o: %.cu
 	$(NVCC) $(NVFLAGS) -c $< -o $@
 
-headless: tiny_mc.o $(C_OBJS)
+headless: $(TINY_OBJS)
 	$(NVCC) $(NVFLAGS) -o $@ $^ $(TINY_LDFLAGS)
 
-head: cg_mc.o $(C_OBJS)
+head: $(CG_OBJS)
 	$(NVCC) $(NVFLAGS) -o $@ $^ $(CG_LDFLAGS)
 
 clean:
-	rm -f $(TARGETS) *.o && rm -rf vtune_results r000hs
+	rm -f $(TARGETS) *.o

