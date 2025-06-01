@@ -2,12 +2,13 @@ Compilador: icx
 Flags: -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto -fvectorize -funsafe-math-optimizations -fno-stack-protector -mavx2 -falign-functions=32 -fstrict-aliasing -DSEED=666666
 Ejecucion: ./headless
 Compilacion: Makefile
-Cambios: Xorshift32
+Cambios: codigo corriendo en GPU
 
 Resultados:
 
-PHOTONS   Mphotons/seg
-67108864  0.798064
+PHOTONS     Mphotons/seg
+4294967296  36.095119
+
 
 
 
