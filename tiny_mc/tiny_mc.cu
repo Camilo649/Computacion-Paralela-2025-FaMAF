@@ -41,7 +41,7 @@ int main()
     cudaEventCreate(&e2);
     cudaEventRecord(e1);
 
-    simulate_kernel<<<PHOTONS/THREADS_PER_BLOCK, THREADS_PER_BLOCK>>>(d_heats, d_heats_squared);
+    simulate_kernel<<<(PHOTONS/THREADS_PER_BLOCK)/PHOTONS_PER_THREAD, THREADS_PER_BLOCK>>>(d_heats, d_heats_squared);
     cudaDeviceSynchronize();
 
     cudaEventRecord(e2);
