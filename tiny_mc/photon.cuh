@@ -11,7 +11,7 @@
 * @param heats_squared     Arreglo que acumula el cuadrado de la energía absorbida (para varianza).
 * @param rng               Puntero al generador de números aleatorios (Xorshift32).
 */
-__device__ __forceinline__ void photon(float* heats, float* heats_squared, Xorshift32* rng)
+__device__ __forceinline__ void photon(float* __restrict__ heats, float* __restrict__ heats_squared, Xorshift32* __restrict__ rng)
 {
     unsigned long photons = PHOTONS_PER_THREAD;
     const float albedo = MU_S / (MU_S + MU_A);

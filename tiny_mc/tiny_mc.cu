@@ -7,7 +7,7 @@
 #include "xorshift32.cuh"
 
 
-__global__ void simulate_kernel(float* heats, float* heats_squared)
+__global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ heats_squared)
 {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
     if (tid >= PHOTONS) return;
@@ -54,6 +54,16 @@ int main()
     cudaMemcpy(heats_squared, d_heats_squared, size, cudaMemcpyDeviceToHost);
 
     printf("%f\n", PHOTONS / (1000.0f * elapsed_time));
+
+    // printf("# Radius\tHeat\n");
+    // printf("# [microns]\t[W/cm^3]\tError\n");
+    // float t = 4.0f * M_PI * powf(MICRONS_PER_SHELL, 3.0f) * PHOTONS / 1e12;
+    // for (unsigned int i = 0; i < SHELLS - 1; ++i) {
+    //     printf("%6.0f\t%12.5f\t%12.5f\n", i * (float)MICRONS_PER_SHELL,
+    //            heats[i] / t / (i * i + i + 1.0 / 3.0),
+    //            sqrt(heats_squared[i] - heats[i] * heats[i] / PHOTONS) / t / (i * i + i + 1.0f / 3.0f));
+    // }
+    // printf("# extra\t%12.5f\n", heats[SHELLS - 1] / PHOTONS);
 
     cudaFree(d_heats);
     cudaFree(d_heats_squared);
