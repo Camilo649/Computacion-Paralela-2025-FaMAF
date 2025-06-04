@@ -11,9 +11,28 @@ __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ h
 {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
     if (tid >= PHOTONS) return;
+
+    // Fase 1: Incialización
+    __shared__ float heats_local[SHELLS];
+    __shared__ float heats_squared_local[SHELLS];
     Xorshift32 rng;
     xorshift32_init(&rng, SEED ^ (threadIdx.x * 0x9E3779B9u) ^ (blockIdx.x * 0x85EBCA6Bu) ^ (blockDim.x * 0xC2B2AE35u));
-    photon(heats, heats_squared, &rng);
+    if (threadIdx.x < SHELLS) { // OJO! Solo funciona si THREADS_PER_BLOCK >= SHELLS
+        heats_local[threadIdx.x] = 0.0f;
+        heats_squared_local[threadIdx.x] = 0.0f;
+    }
+    __syncthreads();
+
+    // Fase 2: Cómputo
+    photon(heats_local, heats_squared_local, &rng);
+    __syncthreads();
+
+    // Fase 3: Acumulación
+    if (threadIdx.x < SHELLS) 
+    {
+        atomicAdd(&heats[threadIdx.x], heats_local[threadIdx.x]);
+        atomicAdd(&heats_squared[threadIdx.x], heats_squared_local[threadIdx.x]);
+    }
 }
 
 
