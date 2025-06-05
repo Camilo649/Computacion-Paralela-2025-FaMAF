@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <cuda_runtime.h>
+#include <assert.h>
 
 #include "params.h"
 #include "photon.cuh"
@@ -28,16 +29,17 @@ __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ h
     __syncthreads();
 
     // Fase 3: Acumulación
-    if (threadIdx.x < SHELLS) 
-    {
+    if (threadIdx.x < SHELLS) { // OJO! Solo funciona si THREADS_PER_BLOCK >= SHELLS
         atomicAdd(&heats[threadIdx.x], heats_local[threadIdx.x]);
         atomicAdd(&heats_squared[threadIdx.x], heats_squared_local[threadIdx.x]);
     }
 }
 
 
-int main()
-{
+int main() { 
+    
+    assert(THREADS_PER_BLOCK >= SHELLS && "THREADS_PER_BLOCK debe ser mayor o igual a SHELLS");
+
     const int size = SHELLS * sizeof(float);
 
     float* d_heats;
@@ -51,8 +53,8 @@ int main()
     cudaMemGetInfo(&free_mem, &total_mem);
 
     // Reservamos toda la RAM libre del GPU para que nadie mas la usea MUAJAJAJAJ
-    void* gobble;
-    cudaMalloc(&gobble, free_mem - (16 * 1024 * 1024)); // dejamos 16 MiB libres por seguridad
+    //void* gobble;
+    //cudaMalloc(&gobble, free_mem - (16 * 1024 * 1024)); // dejamos 16 MiB libres por seguridad
 
     float elapsed_time;
     cudaEvent_t e1, e2;

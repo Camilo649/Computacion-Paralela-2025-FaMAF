@@ -3,7 +3,7 @@ NVCC = nvcc
 
 # Flags
 NVFLAGS = -O3 -use_fast_math -lineinfo -Xcompiler "-fno-stack-protector -funroll-loops -ffast-math -fstrict-aliasing" \
-          -arch=compute_61 -code=sm_61 -restrict -Xptxas "-O3 -v" -DSEED=666666
+          -gencode arch=compute_75,code=sm_75 -restrict -Xptxas "-O3 -v" -DSEED=666666
 TINY_LDFLAGS = -lm
 CG_LDFLAGS = -lm -lglfw -lGL -lGLEW
 
