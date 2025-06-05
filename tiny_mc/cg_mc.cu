@@ -64,17 +64,14 @@ __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ h
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
     if (tid >= photons_this_frame) return;
 
-    // Fase 1: Inicialización
+    // Fase 1: Incialización
     __shared__ float heats_local[SHELLS];
     __shared__ float heats_squared_local[SHELLS];
-
     Xorshift32 rng;
-    xorshift32_init(&rng, SEED ^ tid); // tid es único por hilo global
-
-    // Inicializa shared memory (evita suposiciones sobre THREADS_PER_BLOCK >= SHELLS)
-    for (int i = threadIdx.x; i < SHELLS; i += blockDim.x) {
-        heats_local[i] = 0.0f;
-        heats_squared_local[i] = 0.0f;
+    xorshift32_init(&rng, SEED ^ (btid * 0x9E3779B9u) ^ (blockIdx.x * 0x85EBCA6Bu) ^ (blockDim.x * 0xC2B2AE35u));
+    if (btid < SHELLS) { // OJO! Solo funciona si THREADS_PER_BLOCK >= SHELLS
+        heats_local[btid] = 0.0f;
+        heats_squared_local[btid] = 0.0f;
     }
     __syncthreads();
 
@@ -83,9 +80,9 @@ __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ h
     __syncthreads();
 
     // Fase 3: Acumulación
-    for (int i = threadIdx.x; i < SHELLS; i += blockDim.x) {
-        atomicAdd(&heats[i], heats_local[i]);
-        atomicAdd(&heats_squared[i], heats_squared_local[i]);
+    if (btid < SHELLS) { // OJO! Solo funciona si THREADS_PER_BLOCK >= SHELLS
+        atomicAdd(&heats[btid], heats_local[btid]);
+        atomicAdd(&heats_squared[btid], heats_squared_local[btid]);
     }
 }
 

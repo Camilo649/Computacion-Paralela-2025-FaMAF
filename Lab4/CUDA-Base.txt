@@ -1,8 +1,10 @@
-Compilador: icx
-Flags: -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto -fvectorize -funsafe-math-optimizations -fno-stack-protector -mavx2 -falign-functions=32 -fstrict-aliasing -DSEED=666666
+Compilador: nvcc
+Flags: -O3 -use_fast_math -lineinfo -Xcompiler "-fno-stack-protector -funroll-loops -ffast-math -fstrict-aliasing" \
+        -gencode arch=compute_61,code=sm_61 -restrict -Xptxas "-O3 -v" -DSEED=666666
 Ejecucion: ./headless
 Compilacion: Makefile
 Cambios: codigo corriendo en GPU
+Nota: Masomenos incremento lineal a la cantidad de MS (30, creo)
 
 Resultados:
 

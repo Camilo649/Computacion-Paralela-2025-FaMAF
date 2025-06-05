@@ -1,14 +1,15 @@
 Compilador: nvcc
 Flags: -O3 -use_fast_math -lineinfo -Xcompiler "-fno-stack-protector -funroll-loops -ffast-math -fstrict-aliasing" \
-        -gencode arch=compute_61,code=sm_61 -restrict -Xptxas "-O3 -v" -DSEED=666666
+        -gencode arch=compute_75,code=sm_75 -restrict -Xptxas "-O3 -v" -DSEED=666666
 Ejecucion: ./headless
 Compilacion: Makefile
-Cambios: calculo de la raiz cuadrada usando el recíproco
+Cambios: Arreglos locales en shared memory
 
 Resultados:
 
 PHOTONS     Mphotons/seg
-4294967296  39.490128
+4294967296  518.703552
+
 
 
 
