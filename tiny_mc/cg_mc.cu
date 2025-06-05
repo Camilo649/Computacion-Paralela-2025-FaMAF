@@ -10,7 +10,6 @@
 #include "xorshift32.cuh"
 
 #define PHOTON_CAP 1 << 16
-#define MAX_PHOTONS_PER_FRAME 20UL
 #define CUDA_CHECK(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line)
 {
@@ -167,7 +166,7 @@ int main(void) {
         glfwPollEvents();
 
         if (remaining_photons > 0) {
-	    unsigned long photons_this_frame = min(MAX_PHOTONS_PER_FRAME, remaining_photons / PHOTONS_PER_THREAD);
+	    unsigned long photons_this_frame = min(THREADS_PER_BLOCK, remaining_photons / PHOTONS_PER_THREAD);
 	    remaining_photons -= photons_this_frame * PHOTONS_PER_THREAD;
 		
 	    glFinish();
