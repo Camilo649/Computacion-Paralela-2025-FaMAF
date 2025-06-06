@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define INV_2PI32 2.3283064365386963e-10f // == 1.0f / 4294967296.0f
+
 /**
 * @brief Estructura para almacenar el estado del generador Xorshift32.
 */
@@ -31,10 +33,15 @@ __device__ __inline__ void xorshift32_init(Xorshift32* rng, uint32_t seed) {
 * @return float Un número aleatorio de punto flotante en el rango [0, 1).
 */
 __device__ __inline__ float xorshift32_norm(Xorshift32* rng) {
-    rng->state ^= rng->state << 13;
-    rng->state ^= rng->state >> 17;
-    rng->state ^= rng->state << 5;
-    return rng->state * (1.0f / 4294967296.0f);
+    uint32_t x = rng->state;
+
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+
+    rng->state = x;
+
+    return __uint2float_rn(x) * INV_2PI32;
 }
 
 #endif // XORSHIFT32_CUH

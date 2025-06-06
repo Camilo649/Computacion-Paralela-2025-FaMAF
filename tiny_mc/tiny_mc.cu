@@ -10,9 +10,9 @@
 
 __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ heats_squared)
 {
-    int gtid = blockIdx.x * blockDim.x + threadIdx.x;
+    unsigned long gtid = blockIdx.x * blockDim.x + threadIdx.x;
     if (gtid >= PHOTONS) return;
-    int btid = threadIdx.x;
+    unsigned long  btid = threadIdx.x;
 
     // Fase 1: Incialización
     __shared__ float heats_local[SHELLS];
