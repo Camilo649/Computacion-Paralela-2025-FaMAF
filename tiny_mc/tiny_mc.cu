@@ -49,7 +49,9 @@ int main() {
     cudaMalloc(&d_heats_squared, size);
     cudaMemset(d_heats, 0, size);
     cudaMemset(d_heats_squared, 0, size);
-    
+
+    cudaFuncSetCacheConfig(simulate_kernel, cudaFuncCachePreferL1);
+
     size_t free_mem, total_mem;
     cudaMemGetInfo(&free_mem, &total_mem);
 

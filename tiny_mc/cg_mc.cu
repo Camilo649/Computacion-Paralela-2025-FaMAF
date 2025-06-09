@@ -10,6 +10,7 @@
 #include "xorshift32.cuh"
 
 #define PHOTON_CAP 1 << 16
+#define THREADS_PER_FRAME 1UL
 #define CUDA_CHECK(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line)
 {
@@ -59,10 +60,10 @@ void main() {
     frag_color = vec4(heat_fit, 0.0, 0.0, 1.0);
 })";
 
-__global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ heats_squared, unsigned long photons_this_frame)
+__global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ heats_squared, unsigned long threads_this_frame)
 {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid >= photons_this_frame) return;
+    if (tid >= threads_this_frame) return;
     int btid = threadIdx.x; 
 
     // Fase 1: Incialización
@@ -70,9 +71,11 @@ __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ h
     __shared__ float heats_squared_local[SHELLS];
     Xorshift32 rng;
     xorshift32_init(&rng, SEED ^ (btid * 0x9E3779B9u) ^ (blockIdx.x * 0x85EBCA6Bu) ^ (blockDim.x * 0xC2B2AE35u));
-    if (btid < SHELLS) { // OJO! Solo funciona si THREADS_PER_BLOCK >= SHELLS
-        heats_local[btid] = 0.0f;
-        heats_squared_local[btid] = 0.0f;
+    if (btid == 0) {
+	for (int i = 0; i < SHELLS; ++i) {
+	    heats_local[i] = 0.0f;
+            heats_squared_local[btid] = 0.0f;
+	}
     }
     __syncthreads();
 
@@ -81,9 +84,11 @@ __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ h
     __syncthreads();
 
     // Fase 3: Acumulación
-    if (btid < SHELLS) { // OJO! Solo funciona si THREADS_PER_BLOCK >= SHELLS
-        atomicAdd(&heats[btid], heats_local[btid]);
-        atomicAdd(&heats_squared[btid], heats_squared_local[btid]);
+    if (btid == 0) {
+	for (int i = 0; i < SHELLS; ++i) {    
+            atomicAdd(&heats[i], heats_local[i]);
+            atomicAdd(&heats_squared[i], heats_squared_local[i]);
+	}
     }
 }
 
@@ -157,6 +162,8 @@ int main(void) {
     CUDA_CHECK(cudaGraphicsGLRegisterBuffer(&cuda_res_heats, ssbo_heats, cudaGraphicsMapFlagsWriteDiscard));
     CUDA_CHECK(cudaGraphicsGLRegisterBuffer(&cuda_res_heats_squared, ssbo_heats_squared, cudaGraphicsMapFlagsWriteDiscard));
 
+    cudaFuncSetCacheConfig(simulate_kernel, cudaFuncCachePreferL1); 
+
     glfwShowWindow(window);
 
     unsigned long remaining_photons = PHOTON_CAP;
@@ -164,8 +171,9 @@ int main(void) {
         glfwPollEvents();
 
         if (remaining_photons > 0) {
-	    unsigned long photons_this_frame = min(THREADS_PER_BLOCK, remaining_photons / PHOTONS_PER_THREAD);
-	    remaining_photons -= photons_this_frame * PHOTONS_PER_THREAD;
+	    unsigned long photons_this_frame = PHOTONS_PER_THREAD * THREADS_PER_FRAME;
+	    if(photons_this_frame > remaining_photons) photons_this_frame = remaining_photons;
+	    remaining_photons -= photons_this_frame;
 		
 	    glFinish();
 
@@ -181,7 +189,7 @@ int main(void) {
 
 	    int threads = THREADS_PER_BLOCK;
 	    int blocks = (photons_this_frame + threads - 1) / threads;
-	    simulate_kernel<<<blocks, threads>>>(dev_heats, dev_heats_squared, photons_this_frame);
+	    simulate_kernel<<<blocks, threads>>>(dev_heats, dev_heats_squared, THREADS_PER_FRAME);
 	    cudaDeviceSynchronize();
 
 	    CUDA_CHECK(cudaGraphicsUnmapResources(2, resources));
