@@ -7,32 +7,49 @@
 #include "photon.cuh"
 #include "xorshift32.cuh"
 
+#define WARPS THREADS_PER_BLOCK/32
 
 __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ heats_squared)
 {
     unsigned long gtid = blockIdx.x * blockDim.x + threadIdx.x;
     if (gtid >= PHOTONS) return;
-    unsigned long  btid = threadIdx.x;
+    unsigned int btid = threadIdx.x;
+    unsigned int wtid = btid / warpSize;
+    //unsigned int lane = btid & (warpSize - 1);
 
     // Fase 1: Incialización
-    __shared__ float heats_local[SHELLS];
-    __shared__ float heats_squared_local[SHELLS];
+    __shared__ float heats_local[WARPS][SHELLS];
+    __shared__ float heats_squared_local[WARPS][SHELLS];
     Xorshift32 rng;
     xorshift32_init(&rng, SEED ^ (btid * 0x9E3779B9u) ^ (blockIdx.x * 0x85EBCA6Bu) ^ (blockDim.x * 0xC2B2AE35u));
     if (btid < SHELLS) { // OJO! Solo funciona si THREADS_PER_BLOCK >= SHELLS
-        heats_local[btid] = 0.0f;
-        heats_squared_local[btid] = 0.0f;
+        for (int i = 0; i < WARPS; ++i) {
+            heats_local[i][btid] = 0.0f;
+            heats_squared_local[i][btid] = 0.0f;
+        }
     }
     __syncthreads();
 
     // Fase 2: Cómputo
-    photon(heats_local, heats_squared_local, &rng);
+    photon(heats_local[wtid], heats_squared_local[wtid], &rng);
     __syncthreads();
 
-    // Fase 3: Acumulación
+
+    // Fase 3.1: Acumulación por warp
+    for (int offset = WARPS / 2; offset > 0; offset /= 2) {
+        if (wtid < offset) {
+            for (int i = 0; i < SHELLS; ++i) {
+                heats_local[wtid][i] += heats_local[wtid + offset][i];
+                heats_squared_local[wtid][i] += heats_squared_local[wtid + offset][i];
+            }
+        }
+        __syncthreads();
+    }
+
+    // Fase 3.2: Acumulación por bloque
     if (btid < SHELLS) { // OJO! Solo funciona si THREADS_PER_BLOCK >= SHELLS
-        atomicAdd(&heats[btid], heats_local[btid]);
-        atomicAdd(&heats_squared[btid], heats_squared_local[btid]);
+        atomicAdd(&heats[btid], heats_local[0][btid]);
+        atomicAdd(&heats_squared[btid], heats_squared_local[0][btid]);
     }
 }
 
@@ -50,7 +67,7 @@ int main() {
     cudaMemset(d_heats, 0, size);
     cudaMemset(d_heats_squared, 0, size);
 
-    cudaFuncSetCacheConfig(simulate_kernel, cudaFuncCachePreferL1);
+    // cudaFuncSetCacheConfig(simulate_kernel, cudaFuncCachePreferL1);
 
     size_t free_mem, total_mem;
     cudaMemGetInfo(&free_mem, &total_mem);

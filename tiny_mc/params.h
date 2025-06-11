@@ -27,7 +27,7 @@
 #endif
 
 #ifndef PHOTONS_PER_THREAD
-#define PHOTONS_PER_THREAD 65536UL
+#define PHOTONS_PER_THREAD 128UL
 #endif
 
 #ifndef THREADS_PER_BLOCK
