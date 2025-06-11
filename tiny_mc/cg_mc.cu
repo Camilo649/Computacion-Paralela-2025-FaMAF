@@ -11,6 +11,7 @@
 
 #define PHOTON_CAP 1 << 16
 #define THREADS_PER_FRAME 1UL
+#define WARPS THREADS_PER_BLOCK/32
 #define CUDA_CHECK(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line)
 {
@@ -60,34 +61,52 @@ void main() {
     frag_color = vec4(heat_fit, 0.0, 0.0, 1.0);
 })";
 
+
 __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ heats_squared, unsigned long threads_this_frame)
 {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
     if (tid >= threads_this_frame) return;
-    int btid = threadIdx.x; 
+    unsigned int btid = threadIdx.x;
+    unsigned int wtid = btid / warpSize;
+    //unsigned int lane = btid & (warpSize - 1);
 
     // Fase 1: Incialización
-    __shared__ float heats_local[SHELLS];
-    __shared__ float heats_squared_local[SHELLS];
+    __shared__ float heats_local[WARPS][SHELLS];
+    __shared__ float heats_squared_local[WARPS][SHELLS];
     Xorshift32 rng;
     xorshift32_init(&rng, SEED ^ (btid * 0x9E3779B9u) ^ (blockIdx.x * 0x85EBCA6Bu) ^ (blockDim.x * 0xC2B2AE35u));
-    if (btid == 0) {
-	for (int i = 0; i < SHELLS; ++i) {
-	    heats_local[i] = 0.0f;
-            heats_squared_local[btid] = 0.0f;
-	}
+    if (btid == 0) {    
+        for (int i = 0; i < WARPS; ++i) {
+	    for (int j = 0; j < WARPS; ++j) {
+                heats_local[i][j] = 0.0f;
+                heats_squared_local[i][j] = 0.0f;
+	    }
+        }
     }
     __syncthreads();
 
     // Fase 2: Cómputo
-    photon(heats_local, heats_squared_local, &rng);
+    photon(heats_local[wtid], heats_squared_local[wtid], &rng);
     __syncthreads();
 
-    // Fase 3: Acumulación
+
+    // Fase 3.1: Acumulación por warp
+    if (threads_this_frame > warpSize)
+    for (int offset = WARPS / 2; offset > 0; offset /= 2) {
+        if (wtid < offset) {
+            for (int i = 0; i < SHELLS; ++i) {
+                heats_local[wtid][i] += heats_local[wtid + offset][i];
+                heats_squared_local[wtid][i] += heats_squared_local[wtid + offset][i];
+            }
+        }
+        __syncthreads();
+    }
+
+    // Fase 3.2: Acumulación por bloque
     if (btid == 0) {
 	for (int i = 0; i < SHELLS; ++i) {    
-            atomicAdd(&heats[i], heats_local[i]);
-            atomicAdd(&heats_squared[i], heats_squared_local[i]);
+            atomicAdd(&heats[i], heats_local[0][i]);
+            atomicAdd(&heats_squared[i], heats_squared_local[0][i]);
 	}
     }
 }
