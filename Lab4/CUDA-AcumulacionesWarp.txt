@@ -4,13 +4,13 @@ Flags: -O3 -use_fast_math -lineinfo -Xcompiler "-fno-stack-protector -funroll-lo
 Ejecucion: ./headless
 Compilacion: Makefile
 Cambios: Arreglos locales en shared memory
-Fotones por Hilo: 256
-Hilos por Bloques: 65536
+Fotones por Hilo: 128
+Hilos por Bloques: 256
 
 Resultados:
 
 PHOTONS     Mphotons/seg
-4294967296  408.199219
+4294967296  470.477448
 
 
 
