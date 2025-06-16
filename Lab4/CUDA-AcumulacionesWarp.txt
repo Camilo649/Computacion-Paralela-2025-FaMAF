@@ -3,14 +3,14 @@ Flags: -O3 -use_fast_math -lineinfo -Xcompiler "-fno-stack-protector -funroll-lo
         -gencode arch=compute_75,code=sm_75 -restrict -Xptxas "-O3 -v" -DSEED=666666
 Ejecucion: ./headless
 Compilacion: Makefile
-Cambios: Arreglos locales en shared memory
+Cambios: Arreglos locales por warp en shared memory
 Fotones por Hilo: 128
-Hilos por Bloques: 256
+Hilos por Bloques: 128
 
 Resultados:
 
 PHOTONS     Mphotons/seg
-4294967296  470.477448
+4294967296  478.057068
 
 
 

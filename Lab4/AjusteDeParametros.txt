@@ -1,0 +1,50 @@
+Compilador: nvcc
+Flags: -O3 -use_fast_math -lineinfo -Xcompiler "-fno-stack-protector -funroll-loops -ffast-math -fstrict-aliasing" \
+        -gencode arch=compute_75,code=sm_75 -restrict -Xptxas "-O3 -v" -DSEED=666666
+Ejecucion: ./headless
+Compilacion: Makefile
+Cambios: Arreglos locales por warp en shared memory
+
+Resultados:
+
+THREADS_PER_BLOCK PHOTONS_PER_THREAD Mphotons/seg
+128               1                  430.191132
+128               2                  449.769470
+128               4                  462.233154
+128               8                  468.974091
+128               16                 473.018066
+128               32                 475.123322
+128               64                 476.158936
+128               128                476.391052  <-- MEJOR
+128               256                475.788971
+128               512                474.304657
+128               1024               470.390839
+256               1                  414.652832
+256               2                  439.132965
+256               4                  452.967041
+256               8                  464.727142
+256               16                 470.314362
+256               32                 473.459442
+256               64                 475.075165
+256               128                474.070160
+256               256                475.498047
+256               512                474.416077
+256               1024               468.258942
+512               1                  499.015289
+512               2                  421.829224
+512               4                  444.968933
+512               8                  458.630402
+512               16                 461.990601
+512               32                 470.518921
+512               64                 472.909821
+512               128                468.461060
+512               256                474.598633
+512               512                471.505768
+512               1024               464.860229
+
+
+
+
+
+
+
