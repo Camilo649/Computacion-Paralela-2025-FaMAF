@@ -42,6 +42,7 @@
 *.hex
 headless
 head
+mixed_sim
 
 # Debug files
 *.dSYM/

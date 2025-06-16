@@ -12,7 +12,7 @@
 __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ heats_squared)
 {
     unsigned long gtid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (gtid >= PHOTONS) return;
+    if (gtid >= PHOTONS_GPU) return;
     unsigned int btid = threadIdx.x;
     unsigned int wtid = btid / warpSize;
     //unsigned int lane = btid & (warpSize - 1);
@@ -73,8 +73,8 @@ int main() {
     cudaMemGetInfo(&free_mem, &total_mem);
 
     // Reservamos toda la RAM libre del GPU para que nadie mas la usea MUAJAJAJAJ
-    //void* gobble;
-    //cudaMalloc(&gobble, free_mem - (16 * 1024 * 1024)); // dejamos 16 MiB libres por seguridad
+    void* gobble;
+    cudaMalloc(&gobble, free_mem - (16 * 1024 * 1024)); // dejamos 16 MiB libres por seguridad
 
     float elapsed_time;
     cudaEvent_t e1, e2;
@@ -82,7 +82,7 @@ int main() {
     cudaEventCreate(&e2);
     cudaEventRecord(e1);
 
-    simulate_kernel<<<(PHOTONS/THREADS_PER_BLOCK)/PHOTONS_PER_THREAD, THREADS_PER_BLOCK>>>(d_heats, d_heats_squared);
+    simulate_kernel<<<PHOTONS_GPU/(THREADS_PER_BLOCK*PHOTONS_PER_THREAD), THREADS_PER_BLOCK>>>(d_heats, d_heats_squared);
     cudaDeviceSynchronize();
 
     cudaEventRecord(e2);
@@ -94,7 +94,7 @@ int main() {
     float* heats_squared = (float*)malloc(size);
     cudaMemcpy(heats_squared, d_heats_squared, size, cudaMemcpyDeviceToHost);
 
-    printf("%f\n", PHOTONS / (1000.0f * elapsed_time));
+    printf("%f\n", PHOTONS_GPU / (1000.0f * elapsed_time));
 
     // printf("# Radius\tHeat\n");
     // printf("# [microns]\t[W/cm^3]\tError\n");

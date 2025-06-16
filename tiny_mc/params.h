@@ -7,7 +7,7 @@
 #endif
 
 #ifndef PHOTONS_GPU
-#define PHOTONS_GPU 6442450944UL // 64G photons
+#define PHOTONS_GPU 4294967296UL // 64G photons
 #endif
 
 #ifndef PHOTONS_CPU
@@ -27,7 +27,11 @@
 #endif
 
 #ifndef SEED
-#define SEED ((uint32_t)(time(NULL) & 0xFFFFFFFF)) // Random seed
+#  ifdef __CUDACC__
+#    define SEED 123456789U // Fijo para CUDA
+#  else
+#    define SEED ((uint32_t)(time(NULL) & 0xFFFFFFFF)) // Dinámico para CPU
+#  endif
 #endif
 
 #ifndef PHOTONS_PER_THREAD
