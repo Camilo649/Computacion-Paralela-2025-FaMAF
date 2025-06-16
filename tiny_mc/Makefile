@@ -1,31 +1,26 @@
-# Compilers
 NVCC = nvcc
 
-# Flags
-NVFLAGS = -O3 -use_fast_math -lineinfo -Xcompiler "-fno-stack-protector -funroll-loops -ffast-math -fstrict-aliasing" \
-          -gencode arch=compute_75,code=sm_75 -restrict -Xptxas "-O3 -v" -DSEED=666666
-TINY_LDFLAGS = -lm
-CG_LDFLAGS = -lm -lglfw -lGL -lGLEW
+NVFLAGS = -O3 -gencode arch=compute_75,code=sm_75 -Xcompiler "-fopenmp -O3 -march=znver3 -ffast-math -funroll-loops"
 
-TARGETS = headless head
+SRC = tiny_mc.cu photon.cuh xorshift32.cuh photon.c xorshift32.c
+OBJ = $(SRC:.c=.o)
+OBJ := $(OBJ:.cu=.o)
 
-# Sources
-TINY_SOURCES = tiny_mc.cu
-CG_SOURCES = cg_mc.cu
+TARGET = mixed_sim
 
-# Object files
-TINY_OBJS = $(patsubst %.cu, %.o, $(TINY_SOURCES))
-CG_OBJS = $(patsubst %.cu, %.o, $(CG_SOURCES))
+all: $(TARGET)
 
-# Default rules
+%.o: %.cpp
+	$(NVCC) $(NVFLAGS) -x c++ -c $< -o $@
+
+%.o: %.c
+	$(NVCC) $(NVFLAGS) -x c -c $< -o $@
+
 %.o: %.cu
 	$(NVCC) $(NVFLAGS) -c $< -o $@
 
-headless: $(TINY_OBJS)
-	$(NVCC) $(NVFLAGS) -o $@ $^ $(TINY_LDFLAGS)
-
-head: $(CG_OBJS)
-	$(NVCC) $(NVFLAGS) -o $@ $^ $(CG_LDFLAGS)
+$(TARGET): $(OBJ)
+	$(NVCC) $(NVFLAGS) -o $@ $^ -lm
 
 clean:
-	rm -f $(TARGETS) *.o
+	rm -f *.o $(TARGET)

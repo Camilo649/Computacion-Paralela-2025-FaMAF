@@ -1,0 +1,41 @@
+Compilador: icx
+Flags: -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto -fvectorize -funsafe-math-optimizations -fimf-use-svml=1 -fno-stack-protector -mavx2 -falign-functions=32 -fstrict-aliasing -qopenmp -DSEED=1234567
+Ejecucion: ./headless
+Compilacion: Makefile
+Cambios: Multithreading guiado con openmp para 16G Fotones
+
+Resultados:
+
+CHUNK_SIZE Mphotons/seg
+1          82.456003
+2          84.726253
+4          84.731052
+8          84.732093
+16         84.741091  <--- MEJOR
+32         84.541128
+64         84.735725
+128        84.542932
+256        84.732791
+512        84.739279
+1024       84.714219
+2048       84.731971
+4096       84.549255
+8192       83.735400
+16384      84.651685
+32768      84.731121
+65536      84.651844
+131072     84.579777
+262144     84.646237
+524288     84.249853
+1048576    83.288105
+2097152    83.629999
+4194304    80.515491
+8388608    81.148060
+16777216   75.094619
+33554432   58.619519
+67108864   58.550895
+134217728  29.918366
+268435456  15.666589
+
+
+

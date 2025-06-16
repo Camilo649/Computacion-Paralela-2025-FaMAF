@@ -1,0 +1,19 @@
+Compilador: icx
+Flags: -g -Wall -Wextra -Werror -O3 -march=znver3 -mtune=znver3 -ffast-math -funroll-loops -flto
+Ejecucion: ./headless
+Compilacion: Makefile
+Cambios: Cambios: rand por XorShift128+
+
+Resultados:
+
+PHOTONS  Kphotons/seg
+65536    524.288000
+131072   524.288000
+262144   524.288000
+524288   524.288000
+1048576  524.288000
+2097152  524.288000
+4194304  524.288000
+8388608  532.610032
+16777216 528.416252
+33554432 534.731984

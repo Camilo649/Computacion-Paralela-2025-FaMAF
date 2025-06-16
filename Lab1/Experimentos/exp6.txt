@@ -1,0 +1,24 @@
+Compilador: icx
+Flags: -g -std=c11 -ffast-math  -Wall -Wextra -Werror -O3 -march=native
+Ejecucion: taskset -c 0,1 ./headless
+Compilacion: Makefile
+Cambios: Arreglo de fotones
+
+Resultados:
+
+PHOTONS	 Kphotons/seg
+65536	 592.245904
+131072	 577.164187
+262144	 570.115789
+524288	 564.969307
+1048576	 561.167721
+2097152	 555.219171
+4194304	 549.047543
+8388608  545.099033
+16777216 543.652768
+33554432 537.858386
+
+
+
+
+
