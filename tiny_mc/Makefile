@@ -1,50 +1,31 @@
-# Makefile para proyecto CUDA + C con compilador Intel (icx)
+# Compilers
+NVCC = nvcc
 
-# Compiladores
-CC      = icx
-NVCC    = nvcc
+# Flags
+NVFLAGS = -O3 -use_fast_math -lineinfo -Xcompiler "-fno-stack-protector -funroll-loops -ffast-math -fstrict-aliasing" \
+          -gencode arch=compute_75,code=sm_75 -restrict -Xptxas "-O3 -v" -DSEED=666666
+TINY_LDFLAGS = -lm
+CG_LDFLAGS = -lm -lglfw -lGL -lGLEW
 
-# Arquitectura del CPU Intel Xeon E5-2680 v4 (Broadwell con AVX2 y FMA)
-ARCH_FLAGS = -march=broadwell -mtune=broadwell
+TARGETS = headless head
 
-# Flags para icx (CPU C code)
-CFLAGS = -Wall -Wextra -Werror -O3 $(ARCH_FLAGS) \
-         -ffast-math -funroll-loops -fimf-use-svml=1 \
-         -mavx2 -mfma -falign-functions=32 -fPIC
+# Sources
+TINY_SOURCES = tiny_mc.cu
+CG_SOURCES = cg_mc.cu
 
-# Flags para nvcc (CUDA code)
-NVCCFLAGS = -O3 -gencode arch=compute_75,code=sm_75 \
-            -Xcompiler "$(CFLAGS)" \
-            --compiler-bindir=/opt/intel/oneapi/compiler/2025.0/bin/icx \
-            -allow-unsupported-compiler
+# Object files
+TINY_OBJS = $(patsubst %.cu, %.o, $(TINY_SOURCES))
+CG_OBJS = $(patsubst %.cu, %.o, $(CG_SOURCES))
 
-# Objetos
-OBJS = tiny_mc.o photon.o xorshift32.o
+# Default rules
+%.o: %.cu
+	$(NVCC) $(NVFLAGS) -c $< -o $@
 
-# Target final
-TARGET = mixed_sim
+headless: $(TINY_OBJS)
+	$(NVCC) $(NVFLAGS) -o $@ $^ $(TINY_LDFLAGS)
 
-# Regla principal
-all: $(TARGET)
+head: $(CG_OBJS)
+	$(NVCC) $(NVFLAGS) -o $@ $^ $(CG_LDFLAGS)
 
-# Compilar archivo CUDA
-tiny_mc.o: tiny_mc.cu
-	$(NVCC) $(NVCCFLAGS) -c $< -o $@
-
-# Compilar módulos C con icx
-photon.o: photon.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-xorshift32.o: xorshift32.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Linking final con nvcc para mezclar C + CUDA y OpenMP
-$(TARGET): $(OBJS)
-	$(NVCC) $(NVCCFLAGS) -Xcompiler "-qopenmp" -o $@ $^ -lm
-
-# Limpieza
 clean:
-	rm -f *.o $(TARGET)
-
-.PHONY: all clean
-
+	rm -f $(TARGETS) *.o
