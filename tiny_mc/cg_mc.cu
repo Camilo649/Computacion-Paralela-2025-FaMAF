@@ -65,11 +65,11 @@ void main() {
 
 __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ heats_squared, unsigned long threads_this_frame)
 {
-    int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid >= threads_this_frame) return;
+    unsigned int gtid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (gtid >= threads_this_frame) return;
     unsigned int btid = threadIdx.x;
     unsigned int wtid = btid / warpSize;
-    //unsigned int lane = btid & (warpSize - 1);
+    unsigned int lane = btid & (warpSize - 1);
 
     // Fase 1: Incialización
     __shared__ float heats_local[WARPS][SHELLS];
@@ -94,7 +94,7 @@ __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ h
     // Fase 3.1: Acumulación por warp
     if (threads_this_frame > warpSize)
     for (int offset = WARPS / 2; offset > 0; offset /= 2) {
-        if (wtid < offset) {
+        if (lane == 0 && wtid < offset) {
             for (int i = 0; i < SHELLS; ++i) {
                 heats_local[wtid][i] += heats_local[wtid + offset][i];
                 heats_squared_local[wtid][i] += heats_squared_local[wtid + offset][i];
