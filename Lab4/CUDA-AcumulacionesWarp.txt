@@ -9,8 +9,8 @@ Hilos por Bloques: 128
 
 Resultados:
 
-PHOTONS     Mphotons/seg
-4294967296  478.057068
+PHOTONS      Mphotons/seg
+68719476736  478.547504
 
 
 
