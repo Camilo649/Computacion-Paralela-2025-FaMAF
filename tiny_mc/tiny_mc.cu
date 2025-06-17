@@ -34,7 +34,6 @@ __global__ void simulate_kernel(float* __restrict__ heats, float* __restrict__ h
     photon(heats_local[wtid], heats_squared_local[wtid], &rng);
     __syncthreads();
 
-
     // Fase 3.1: Acumulación por warp
     for (int offset = WARPS / 2; offset > 0; offset /= 2) {
         if (wtid < offset) {
